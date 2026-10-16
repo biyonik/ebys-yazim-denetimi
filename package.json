@@ -1,0 +1,22 @@
+{
+  "name": "ebys-yazim",
+  "version": "0.1.0",
+  "description": "EBYS evrak editörü için yerel çalışan Türkçe yazım denetimi (Chrome eklentisi)",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:dev": "node build.mjs --dev",
+    "typecheck": "tsc -p .",
+    "test": "node --test test/unit/*.test.ts",
+    "test:e2e": "node build.mjs --dev && python3 test/e2e/run.py"
+  },
+  "author": "Ahmet Altun",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "ckeditor4": "^4.22.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "type": "module"
+}

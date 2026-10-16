@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <title>EBYS Editör Test Ortamı</title>
+  <!--
+    Gerçek EBYS sayfasındaki yapının birebir kopyası:
+      td.ui-edys-editor > textarea#yeniGidenEvrakForm:ckeditorInstance_window1
+      → CKEditor 4 → div#cke_{ad} > … > iframe.cke_wysiwyg_frame (src="")
+    CKEditor 4.22.1: açık kaynak lisanslı son sürüm; yalnızca test için.
+  -->
+  <script src="/node_modules/ckeditor4/ckeditor.js"></script>
+  <style>
+    body { font: 14px system-ui, sans-serif; margin: 24px; background: #f4f5f7; }
+    table.layout { width: 820px; background: #fff; border: 1px solid #ccc; }
+    td.ui-edys-editor { padding: 0; }
+  </style>
+</head>
+<body>
+  <h3>Giden Evrak (test)</h3>
+  <form id="yeniGidenEvrakForm" onsubmit="return false">
+    <table class="layout"><tr>
+      <td class="ui-edys-editor">
+        <textarea id="yeniGidenEvrakForm:ckeditorInstance_window1" name="yeniGidenEvrakForm:ckeditorInstance_window1"><p style="text-align:center"><strong>T.C.</strong><br><strong>BALIKESİR VALİLİĞİ</strong></p>
+<p>Sayı&nbsp;&nbsp;&nbsp;&nbsp;: E-12345678-010.06-123<br>Konu&nbsp;&nbsp;&nbsp;: Toplantı hk.</p>
+<p>İlgi yazıya istinaden, 2026da yapılacak toplantı saat 3'de başlayacaktır. Toplantıya yanlız birim amirleri katılacaktır , diğer personel hala bilgilendirilmedi.</p>
+<p>hiç bir birimin or<b>jin</b>al evrakları teslim etmemesi gerekmektedir.Bilgilerinize ve ve gereğini arzederim.</p>
+<table border="1"><tr><td>adet</td><td>Mesafe 5km</td></tr></table>
+<p>Yavaş yavaş ilerleyen süreçte kurum.gov.tr adresi kullanılacaktır.</p></textarea>
+      </td>
+    </tr></table>
+  </form>
+  <script>
+    CKEDITOR.replace('yeniGidenEvrakForm:ckeditorInstance_window1', {
+      versionCheck: false,
+      language: 'tr',
+      height: 390,
+      contentsCss: [],
+      bodyClass: 'evrak',
+      extraAllowedContent: '*(*);*{*}',
+    });
+    CKEDITOR.addCss('body.evrak { font-family: "Times New Roman", serif; font-size: 12pt; line-height: 150%; margin: 16px 24px; }');
+  </script>
+</body>
+</html>

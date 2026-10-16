@@ -1,0 +1,5 @@
+{
+  "$comment": "Eklentinin çalışacağı EBYS adresleri. Yalnızca bu adreslerde çalışır; başka hiçbir siteye erişimi yoktur. Kendi kurumunun EBYS adresini yaz.",
+  "origins": ["https://ebys.KURUM.gov.tr/*"],
+  "devOrigins": ["http://localhost/*", "http://127.0.0.1/*"]
+}
