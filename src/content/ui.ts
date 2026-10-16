@@ -1,4 +1,4 @@
-import type { Issue, Severity } from '../core/types.ts';
+import type { Category, Issue, Severity } from '../core/types.ts';
 
 /**
  * Arayüz: öneri balonu, sayaç rozeti, sorun paneli ve bildirim.
@@ -13,7 +13,10 @@ import type { Issue, Severity } from '../core/types.ts';
  * ile yazılır. innerHTML yalnızca bizim ürettiğimiz sabit işaretleme içindir.
  */
 
-const SEV_LABEL: Record<Severity, string> = { hata: 'Yazım hatası', uyari: 'Kontrol edin', oneri: 'Öneri' };
+const SEV_LABEL: Record<Severity, string> = { hata: 'Hata', uyari: 'Kontrol edin', oneri: 'Öneri' };
+/** Hata başlığı sorunun türünü söyler: yönetmelik ihlaline "Yazım hatası" demek yanıltır */
+const CAT_LABEL: Record<Category, string> = { yazim: 'Yazım hatası', kural: 'Dil bilgisi', noktalama: 'Noktalama', bicim: 'Yazışma kuralı' };
+const titleOf = (i: Issue) => (i.severity === 'hata' ? CAT_LABEL[i.category] : SEV_LABEL[i.severity]);
 const SEV_COLOR: Record<Severity, string> = { hata: '#d93025', uyari: '#e37400', oneri: '#1a73e8' };
 const SEV_ORDER: Severity[] = ['hata', 'uyari', 'oneri'];
 
@@ -66,6 +69,7 @@ button { font: inherit; cursor: pointer; border-radius: 6px; color: inherit; }
   max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .arrow { color: #9aa0a6; margin: 0 6px; flex: none; }
 .to { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.to.none { font-weight: 400; color: #80868b; font-style: italic; }
 .empty { padding: 14px 12px; color: #188038; }
 
 .toast {
@@ -87,7 +91,8 @@ export interface PanelHandlers {
   onClose(): void;
 }
 
-const show = (s: string) => (s.trim() === '' ? '␣ (tek boşluk)' : s);
+/** Görünmez önerileri görünür kıl: silme ("") ve tek boşluk (" ") düğmede boş görünürdü */
+const show = (s: string) => (s === '' ? '⌫ sil' : s.trim() === '' ? '␣ (tek boşluk)' : s);
 
 export class EditorUi {
   private readonly host: HTMLElement;
@@ -174,9 +179,9 @@ export class EditorUi {
     this.hidePopover();
     const pop = this.el('div', 'card pop');
     pop.setAttribute('role', 'dialog');
-    pop.setAttribute('aria-label', SEV_LABEL[issue.severity]);
+    pop.setAttribute('aria-label', titleOf(issue));
 
-    const sev = this.el('div', 'sev', SEV_LABEL[issue.severity]);
+    const sev = this.el('div', 'sev', titleOf(issue));
     sev.style.color = SEV_COLOR[issue.severity];
     const msg = this.el('p', 'msg', issue.message);
 
@@ -267,7 +272,9 @@ export class EditorUi {
           dot,
           this.el('span', 'from', show(is.text)),
           this.el('span', 'arrow', '→'),
-          this.el('span', 'to', is.suggestions.length > 1 ? is.suggestions.join(' / ') : show(is.suggestions[0] ?? '')),
+          is.suggestions.length === 0
+            ? this.el('span', 'to none', 'açıklamaya bakın')
+            : this.el('span', 'to', is.suggestions.map(show).join(' / ')),
         );
         item.addEventListener('click', () => h.onPick(is));
         list.appendChild(item);
