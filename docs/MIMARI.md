@@ -1,7 +1,8 @@
 # EBYS Yazım Denetimi — Mimari
 
-> Durum: **Faz 1 tamamlandı** (editör entegrasyonu + deterministik kurallar).
-> Sıradaki: **Faz 2 — morfoloji motoru**.
+> Durum: **Faz 1 tamamlandı**, **Faz 3'ün sözlüksüz çözülebilen kısmı eklendi**
+> (de/da, ki, mi; özel ad ve kurum adı kesmesi).
+> Sıradaki: **Faz 2 — morfoloji motoru** (kök sözlüğü gerektiren her şey).
 
 ## 1. Amaç ve sınırlar
 
@@ -99,7 +100,25 @@ Testlerle doğrulanmış davranışlar:
 | `noktalama.*` | `,` öncesi boşluk, `,olur` | hata | `Sayı :` başlık hizalaması, alan adları, `T.C.` |
 | `bosluk.cift` | çift boşluk | öneri | Satır başı girintisi |
 | `tekrar.kelime` | `ve ve` | uyarı | İkilemeler (`yavaş yavaş`) — yalnızca işlev kelimeleri |
-| `buyuk-harf.cumle-basi` | `. sonra`, paragraf başı küçük harf | uyarı | Kısaltma, sıra sayı, üç nokta, tablo hücresi, madde imi |
+| `buyuk-harf.cumle-basi` | `. sonra`, paragraf başı küçük harf | uyarı | Kısaltma, sıra sayı, üç nokta, tablo hücresi, madde imi. Başka bir sorunla çakışırsa o sorunun önerisine işlenir (`orjinal` → `Orijinal`) |
+| `baglac.de` | `banada`, `onuda`, `buradada`, `hemde` | hata | Yalnızca bulunma eki alamayan kapalı sınıf gövdeler. `maddede`, `ifadede`, `adada` meşru bulunma hâli |
+| `baglac.de` (belirsiz) | `bende`, `bizde` | uyarı | "Ben de geldim" ↔ "dosya bende" anlamla ayrılır |
+| `baglac.ki` | `biliyorumki`, `olacakki`, `değilki` | hata | Sıfat yapan `-ki` (evdeki, şimdiki, yarınki) ve kalıplaşmışlar (mademki, halbuki, sanki) |
+| `baglac.ki` (geçmiş zaman) | `geldiki` | uyarı | `plastiki` gibi alıntı isimlerle aynı ses dizisi; kök sözlüğü olmadan ayrılamaz |
+| `baglac.mi` / `mi-uyum` | `geliyormusun`, `varmı`, `geliyor mi` → `mu` | hata | Ünlü düşmesi (`resmi`, `ismi`, `kısmı`), rivayet (`gelecekmiş`), iyelik (`doğrumuz`) |
+| `kesme.ozel-ad` | `Ahmetin`, `Ankarada`, `Türkiyenin`, `Atatürkün` | hata / uyarı | Yapım ekleri (`Ankaralı`, `Türkçe`). Birleşik görünen adlar (`Emine`, `Nurdan`). Cins isimle aynı adlar cümle başında hiç, cümle içinde uyarıyla |
+| `kesme.ozel-ad.uyum` | `Ayşe'in` → `Ayşe'nin`, `Ahmet'de` → `Ahmet'te` | hata | — |
+| `kesme.kurum` | `Valiliği'ne` → `Valiliğine` | hata | Kısaltmalar (`TBMM'ye`) kesmeyle yazılır |
+
+### Kesinlik sınırı: kök sözlüğü olmadan neyi çözemeyiz?
+
+| Örnek | Neden çözülemez | Çözüm |
+|---|---|---|
+| `kitabıda` (kitabı da) ↔ `kapıda` (kapı+da) | İkisi de "ünlü + da". Gövdenin `kapı` mı `kitap+ı` mı olduğunu ancak kök sözlüğü söyler | Faz 2 |
+| `geldide` (geldi de) ↔ `vadide` (vadi+de) | Fiil mi isim mi? | Faz 2 |
+| `kesti ki` ↔ `plastiki` | Aynı ses dizisi | Faz 2 |
+| `Yılmazın`, `Kaplanın` gibi listede olmayan soyadları | Ad listesi sonlu | Faz 5 (kurum/kullanıcı sözlüğü) |
+| `o da` ↔ `oda` | Yazıldıktan sonra ikisi de geçerli kelime | Bağlam; ancak olasılıksal model ile |
 
 ## 6. Yol haritası (inşa sırası)
 

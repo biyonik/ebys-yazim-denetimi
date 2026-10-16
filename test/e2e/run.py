@@ -224,7 +224,32 @@ def main():
             )
             ok(True, "yazılan metin debounce sonrası denetlendi")
 
-            print("9) Ağ")
+            print("9) Gerçek EBYS örneği: bağlaç, özel ad, sayı")
+            sample = "orjinal Ahmetin banada ona da 3te 5te"
+            # Kullanıcının EBYS'de yazdığı içerikle birebir aynı biçim: tek <p>
+            page.evaluate(f"() => CKEDITOR.instances['{ED}'].setData('<p>{sample}</p>')")
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');
+                           return h && [...h].length === 5; }""",
+                timeout=4000,
+            )
+            f3 = [fr for fr in page.frames if fr != page.main_frame][0]
+            marked = highlights(f3)["hata"]
+            ok(marked == ["orjinal", "Ahmetin", "banada", "3te", "5te"], f"5 hata işaretlendi: {marked}")
+            ok("ona da" not in " ".join(marked), "doğru yazılmış 'ona da' işaretlenmedi")
+            for word, fix in [("banada", "bana da"), ("Ahmetin", "Ahmet'in"), ("orjinal", "Orijinal")]:
+                click_word(page, f3, word)
+                wait_pop(page)
+                btn = page.locator("ebys-yazim-ui .pop .sug").first
+                ok(btn.inner_text() == fix, f"öneri: {word} → {fix}")
+                btn.click()
+                time.sleep(0.45)
+            final = get_data(page)
+            ok("Orijinal Ahmet'in bana da ona da 3te 5te" in final, f"düzeltilmiş metin: {final.strip()!r}")
+            page.screenshot(path=str(SHOTS / "03-ebys-ornek.png"))
+
+            print("10) Ağ")
             ok(external == [], f"dış ağ isteği yok ({len(external)})")
 
             errs = [c for c in console if "ebys-yazim" in c or c.startswith("error")]
