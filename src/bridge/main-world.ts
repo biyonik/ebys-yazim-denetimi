@@ -14,6 +14,7 @@ interface CkEditor {
   on(name: string, fn: () => void): void;
   focus(): void;
   updateElement(): void;
+  execCommand(name: string): boolean;
 }
 interface CkGlobal {
   instances: Record<string, CkEditor>;
@@ -58,6 +59,11 @@ interface CkGlobal {
         break;
       case 'focus':
         ed.focus();
+        break;
+      case 'undo':
+        // CKEditor'ün kendi undo'su: kullanıcının Ctrl+Z'siyle aynı yol
+        ed.execCommand('undo');
+        ed.updateElement();
         break;
     }
   });

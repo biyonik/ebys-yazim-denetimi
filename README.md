@@ -34,8 +34,11 @@ sonrası yeniden bağlanma ve dış ağ isteği olmaması.
 
 - Altı dalgalı kırmızı: **hata** · turuncu: **kontrol edin** (bağlama bağlı) · mavi noktalı: **öneri**
 - İşaretli kelimeye tıkla → öneriyi seç ya da **Yoksay**.
-- Editörün sağ altındaki rozete tıkla → sıradaki soruna git.
-- Her düzeltme CKEditor'ün kendi geri al (Ctrl+Z) geçmişine tek adım olarak girer.
+- Editörün sağ altındaki rozete tıkla → **sorun paneli**: tüm sorunların listesi ve **Tümünü düzelt**.
+- **Tümünü düzelt** yalnızca tek doğru cevabı olan sorunlara dokunur (kırmızı hatalar, mavi biçim
+  önerileri). Turuncu uyarılar ("hala/hâlâ", "bende/ben de") anlamı değiştirebileceği için hiçbir zaman
+  otomatik uygulanmaz.
+- Her düzeltme — toplu düzeltme dahil — CKEditor'ün geri al (Ctrl+Z) geçmişine **tek adım** olarak girer.
 
 ## Klasör yapısı
 

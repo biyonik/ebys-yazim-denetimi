@@ -1,4 +1,5 @@
 import { check, fingerprint } from '../core/engine.ts';
+import { isAutoFixable, MAX_PASSES } from '../core/fix-all.ts';
 import type { Issue } from '../core/types.ts';
 import { CMD_EVENT, type BridgeCommand } from '../shared/protocol.ts';
 import { Highlighter, isSupported } from './highlighter.ts';
@@ -34,12 +35,11 @@ export class EditorSession {
   private timer: number | undefined;
   private detachFns: Array<() => void> = [];
   private readonly ui: EditorUi;
-  private cursor = 0;
 
   constructor(iframe: HTMLIFrameElement, editorName: string) {
     this.iframe = iframe;
     this.editorName = editorName;
-    this.ui = new EditorUi(iframe.ownerDocument, () => this.gotoNext());
+    this.ui = new EditorUi(iframe.ownerDocument, () => this.togglePanel());
     this.ensureAttached();
   }
 
@@ -66,6 +66,7 @@ export class EditorSession {
     // Kullanıcı yazmaya devam ederse balon yolunu kesmesin
     const onKeyDown = () => {
       if (this.ui.isOpen) this.closePopover();
+      if (this.ui.isPanelOpen) this.ui.hidePanel();
     };
     const onScroll = () => {
       this.closePopover();
@@ -170,15 +171,90 @@ export class EditorSession {
     this.ui.hidePopover();
   }
 
-  /** Rozete tıklayınca: imleçten sonraki ilk soruna git */
-  private gotoNext(): void {
+  /** Rozet: sorun panelini aç/kapat */
+  private togglePanel(): void {
+    if (this.ui.isPanelOpen) {
+      this.ui.hidePanel();
+      return;
+    }
+    this.closePopover();
     this.runNow();
-    if (this.issues.length === 0 || !this.doc || !this.index) return;
-    const is = this.issues[this.cursor % this.issues.length]!;
-    this.cursor++;
-    const r = this.index.toDomRange(this.doc, is.start, is.end);
+    this.ui.showPanel(this.issues, this.issues.filter(isAutoFixable).length, this.iframe.getBoundingClientRect(), {
+      onFixAll: () => {
+        this.ui.hidePanel();
+        this.applyAll();
+      },
+      onPick: (is) => {
+        this.ui.hidePanel();
+        this.reveal(is);
+      },
+      onClose: () => {
+        this.ui.hidePanel();
+        send({ op: 'focus', editor: this.editorName });
+      },
+    });
+  }
+
+  /** Sorunu görünür alana kaydırıp balonunu açar */
+  private reveal(issue: Issue): void {
+    if (!this.doc || !this.index) return;
+    const r = this.index.toDomRange(this.doc, issue.start, issue.end);
     r?.startContainer.parentElement?.scrollIntoView({ block: 'center' });
-    this.openPopover(is);
+    this.openPopover(issue);
+  }
+
+  /**
+   * Tümünü düzelt.
+   *
+   * Politika core/fix-all.ts'tedir (yalnızca tek doğru cevabı olanlar).
+   * Uygulama tek bir undo adımıdır: snapshot → N değişiklik → commit.
+   * Ara adımlarda CKEditor'e snapshot aldırılmaz; kullanıcı Ctrl+Z'ye bir kez
+   * bastığında belge toplu düzeltmeden önceki hâline döner.
+   *
+   * Düzeltmeler sağdan sola uygulanır. TextIndex'in ofset eşlemesi metin
+   * düğümü içi konumlara dayandığı için, sondaki bir değişiklik aynı
+   * düğümdeki öndeki konumları kaydırmaz; tek indeksle tüm turu bitiririz.
+   */
+  applyAll(): void {
+    this.closePopover();
+    if (!this.ensureAttached() || !this.body) return;
+    send({ op: 'snapshot', editor: this.editorName });
+    let applied = 0;
+    for (let pass = 0; pass < MAX_PASSES; pass++) {
+      const idx = TextIndex.build(this.body);
+      const fixes = check(idx.text, { ignored })
+        .filter(isAutoFixable)
+        .sort((a, b) => b.start - a.start);
+      let n = 0;
+      for (const f of fixes) {
+        if (idx.text.slice(f.start, f.end) !== f.text) continue;
+        if (idx.replaceMinimal(f.start, f.end, f.suggestions[0]!)) n++;
+      }
+      applied += n;
+      if (n === 0) break; // zincirleme yeni düzeltme kalmadı
+    }
+    send({ op: 'commit', editor: this.editorName });
+    send({ op: 'focus', editor: this.editorName });
+    this.runNow();
+
+    const left = this.issues.length;
+    const text =
+      applied === 0
+        ? 'Otomatik düzeltilecek sorun bulunamadı.'
+        : `${applied} düzeltme uygulandı.` + (left ? ` ${left} sorun kararınıza bırakıldı.` : '');
+    this.ui.showToast(
+      text,
+      this.iframe.getBoundingClientRect(),
+      applied
+        ? {
+            label: 'Geri al',
+            run: () => {
+              send({ op: 'undo', editor: this.editorName });
+              requestAnimationFrame(() => this.runNow());
+            },
+          }
+        : undefined,
+    );
   }
 
   /**

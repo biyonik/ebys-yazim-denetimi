@@ -24,7 +24,8 @@ export const EVT_EVENT = 'ebys-yazim:evt';
 export type BridgeCommand =
   | { op: 'snapshot'; editor: string }
   | { op: 'commit'; editor: string }
-  | { op: 'focus'; editor: string };
+  | { op: 'focus'; editor: string }
+  | { op: 'undo'; editor: string };
 
 export type BridgeEvent =
   | { type: 'ready'; editor: string }

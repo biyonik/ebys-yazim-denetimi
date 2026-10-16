@@ -188,7 +188,10 @@ def main():
             time.sleep(0.4)
             ok("saat 3'te" in get_data(page), "3'te uygulandı")
             page.locator("ebys-yazim-ui .badge").click()
-            ok(page.locator("ebys-yazim-ui .pop").is_visible(), "rozet → sonraki soruna balon açtı")
+            ok(page.locator("ebys-yazim-ui .panel").is_visible(), "rozet → sorun paneli açıldı")
+            page.locator("ebys-yazim-ui .panel .item").first.click()
+            ok(page.locator("ebys-yazim-ui .pop").is_visible(), "panelden seçilen sorunun balonu açıldı")
+            ok(not page.locator("ebys-yazim-ui .panel").is_visible(), "seçimden sonra panel kapandı")
             page.keyboard.press("Escape")
 
             print("7) Yeniden bağlanma")
@@ -249,7 +252,54 @@ def main():
             ok("Orijinal Ahmet'in bana da ona da 3te 5te" in final, f"düzeltilmiş metin: {final.strip()!r}")
             page.screenshot(path=str(SHOTS / "03-ebys-ornek.png"))
 
-            print("10) Ağ")
+            print("10) Tümünü düzelt")
+            LONG = ("orjinal evrakların Ahmetin masasında olduğunu bende biliyorum ama Balıkesir Valiliği'ne "
+                    "gönderilecek yazının saat 3de hazır olması gerekiyormu bilmiyorum , yanlız Mehmetten gelen "
+                    "bilgiye göre toplantı 2026da Ankarada yapılacak ve ve herkez katılacak.Bilgilerinize arzederim.")
+            FIXED = ("Orijinal evrakların Ahmet'in masasında olduğunu bende biliyorum ama Balıkesir Valiliğine "
+                     "gönderilecek yazının saat 3'te hazır olması gerekiyor mu bilmiyorum, yalnız Mehmet'ten gelen "
+                     "bilgiye göre toplantı 2026'da Ankara'da yapılacak ve ve herkes katılacak. Bilgilerinize arz ederim.")
+            # Kalın bir parça: toplu düzeltme biçimi bozmamalı
+            html = "<p>" + LONG.replace("yazının", "<strong>yazının</strong>") + "</p>"
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, html])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');
+                           return h && [...h].length === 13; }""",
+                timeout=4000,
+            )
+            time.sleep(0.4)
+            page.locator("ebys-yazim-ui .badge").click()
+            fx = page.locator("ebys-yazim-ui .panel .fixall")
+            ok(fx.inner_text() == "Tümünü düzelt (13)", f"buton: {fx.inner_text()!r}")
+            ok(page.locator("ebys-yazim-ui .panel .item").count() == 15, "panelde 15 sorun listelendi")
+            page.screenshot(path=str(SHOTS / "04-panel.png"))
+            fx.click()
+            time.sleep(0.5)
+            data = get_data(page)
+            text_now = page.evaluate(f"() => CKEDITOR.instances['{ED}'].editable().getText()")
+            ok(text_now.strip() == FIXED, f"13 düzeltme uygulandı → {text_now.strip()[:80]!r}…")
+            ok("<strong>yazının</strong>" in data, "kalın parça korundu")
+            f4 = [fr for fr in page.frames if fr != page.main_frame][0]
+            h = highlights(f4)
+            ok(h["hata"] == [] and sorted(h["uyari"]) == ["bende", "ve ve"], f"yalnızca uyarılar kaldı: {h}")
+            toast = page.locator("ebys-yazim-ui .toast")
+            ok(toast.is_visible() and "13 düzeltme uygulandı" in toast.inner_text(), f"bildirim: {toast.inner_text()!r}")
+            ta = page.evaluate(f"() => {{ const t = document.createElement('textarea'); t.innerHTML = document.getElementById('{ED}').value; return t.value; }}")
+            ok("arz ederim" in ta, "gizli textarea senkron")
+            page.screenshot(path=str(SHOTS / "05-toplu-duzeltme.png"))
+            toast.locator("button").click()
+            time.sleep(0.5)
+            text_undo = page.evaluate(f"() => CKEDITOR.instances['{ED}'].editable().getText()")
+            ok(text_undo.strip() == LONG, "bildirimdeki 'Geri al' tek adımda tümünü geri aldı")
+            page.evaluate(f"() => CKEDITOR.instances['{ED}'].execCommand('redo')")
+            time.sleep(0.3)
+            ok(page.evaluate(f"() => CKEDITOR.instances['{ED}'].editable().getText()").strip() == FIXED, "redo ile tekrar uygulandı")
+            page.evaluate(f"() => CKEDITOR.instances['{ED}'].execCommand('undo')")
+            time.sleep(0.3)
+            ok(page.evaluate(f"() => CKEDITOR.instances['{ED}'].editable().getText()").strip() == LONG, "Ctrl+Z yolu (undo komutu) da tek adım")
+
+            print("11) Ağ")
             ok(external == [], f"dış ağ isteği yok ({len(external)})")
 
             errs = [c for c in console if "ebys-yazim" in c or c.startswith("error")]
