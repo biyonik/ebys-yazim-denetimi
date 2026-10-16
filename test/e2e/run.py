@@ -299,10 +299,68 @@ def main():
             time.sleep(0.3)
             ok(page.evaluate(f"() => CKEDITOR.instances['{ED}'].editable().getText()").strip() == LONG, "Ctrl+Z yolu (undo komutu) da tek adım")
 
-            print("11) Ağ")
+            print("11) Morfoloji ve yönetmelik (tarayıcıda)")
+            html = ("<p>Konu: Toplantı hazırlığı.</p>"
+                    "<p>Bu kitabıda okudum ve yapilacak işleri listeledim. Sözleşme fesih edilmiştir.</p>"
+                    "<p>Toplam 1500000 TL ödenecektir. Gereğini arz veya rica ederim.</p>")
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, html])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');
+                           return h && [...h].some(r => r.toString() === 'kitabıda'); }""",
+                timeout=5000,
+            )
+            f5 = [fr for fr in page.frames if fr != page.main_frame][0]
+            h = highlights(f5)
+            for w in ["kitabıda", "yapilacak", "hazırlığı", "fesih edilmiştir", "1500000", "arz veya rica"]:
+                ok(w in h["hata"], f"tarayıcıda işaretlendi: {w}")
+            click_word(page, f5, "yapilacak")
+            wait_pop(page)
+            ok(page.locator("ebys-yazim-ui .pop .sug").first.inner_text() == "yapılacak", "öneri: yapilacak → yapılacak")
+            ref_txt = page.locator("ebys-yazim-ui .pop .rule").inner_text()
+            ok("TDK" in ref_txt, f"balonda dayanak gösterildi: {ref_txt!r}")
+            page.keyboard.press("Escape")
+            click_word(page, f5, "1500000")
+            wait_pop(page)
+            ref_txt = page.locator("ebys-yazim-ui .pop .rule").inner_text()
+            ok("m.16(7)" in ref_txt, f"yönetmelik maddesi gösterildi: {ref_txt!r}")
+            page.keyboard.press("Escape")
+
+            print("12) Performans: 5 sayfalık belge")
+            para = ("İlgi (a) yazınızla Bakanlığımıza iletilen talep incelenmiş olup söz konusu hususta "
+                    "gerekli değerlendirmelerin yapılabilmesi için ilgili birimlerin görüşlerine başvurulmuştur. "
+                    "Konuya ilişkin olarak hazırlanan raporun ekte gönderildiği, mevzuat çerçevesinde yürütülecek "
+                    "işlemlerin takvime bağlanarak uygulanmasının uygun olacağı değerlendirilmektedir. Bu kapsamda "
+                    "Müdürlüğünüzce yapılacak çalışmaların sonuçlarının en geç ay sonuna kadar Bakanlığımıza "
+                    "bildirilmesi hususunda gereğini rica ederim. ")
+            doc = "".join(f"<p>{para}</p>" for _ in range(30))
+            words = len(("" + para).split()) * 30
+            console.clear()
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, doc])
+            page.wait_for_timeout(1200)
+            # Bir kelime yazıp debounce sonrası tam denetimi ölç (tur 1: soğuk, tur 2-4: sıcak)
+            f6 = [fr for fr in page.frames if fr != page.main_frame][0]
+            timings = []
+            for k in range(4):
+                # İmleci k'ıncı paragrafın sonuna koy (görünür alan dışında olsa da) ve yaz
+                f6.evaluate("""(k) => { const p = document.body.querySelectorAll('p')[k * 7];
+                    p.scrollIntoView({ block: 'center' });
+                    const r = document.createRange(); r.selectNodeContents(p); r.collapse(false);
+                    const s = getSelection(); s.removeAllRanges(); s.addRange(r); }""", k)
+                page.locator("iframe.cke_wysiwyg_frame").focus()
+                page.keyboard.type(" yapilacak")
+                page.wait_for_timeout(700)
+                timings.append(page.locator("ebys-yazim-ui").get_attribute("data-son-denetim") or "")
+            for tm in timings:
+                print("     " + tm)
+            import re as _re
+            rule_ms = [float(_re.search(r"kurallar ([0-9.]+) ms", tm).group(1)) for tm in timings if "kurallar" in tm]
+            ok(len(rule_ms) == 4 and max(rule_ms[1:]) < 50, f"{words} kelimede sıcak denetim < 50 ms ({rule_ms})")
+
+            print("13) Ağ")
             ok(external == [], f"dış ağ isteği yok ({len(external)})")
 
-            errs = [c for c in console if "ebys-yazim" in c or c.startswith("error")]
+            errs = [c for c in console if c.startswith("error") or ("ebys-yazim" in c and not c.startswith("debug"))]
             ok(not errs, f"konsolda hata yok {errs[:3]}")
             ctx.close()
     finally:

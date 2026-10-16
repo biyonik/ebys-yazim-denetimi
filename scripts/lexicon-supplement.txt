@@ -1,0 +1,14 @@
+# Yerel sözlük ekleri — Zemberek'te bulunmayan ama TDK'ye uygun olan ve resmî
+# yazışmada sık geçen maddeler. Biçim Zemberek'le aynıdır: "kelime [öznitelikler]".
+# Her eklemenin gerekçesi satır sonunda "#" ile yazılır. Ekleme yapmadan önce
+# kelimenin TDK Güncel Türkçe Sözlük'teki yazımını doğrula.
+
+içişleri [A:CompoundP3sg; Roots:iç-iş]          # İçişleri Bakanlığı (Kılavuz §13.6: bitişik)
+dışişleri [A:CompoundP3sg; Roots:dış-iş]        # Dışişleri Bakanlığı
+üstveri                                          # Yönetmelik m.3, m.28 (resmî terim)
+karekod                                          # Yönetmelik m.28
+numaratör                                        # Kılavuz
+internet                                         # TDK: internet
+birisi [P:Pron]                                  # TDK: birisi
+soyad                                            # Yönetmelik m.17, m.29 "ad ve soyad" (TDK maddesi: soyadı)
+kaçıncı [P:Adj]                                  # TDK: kaçıncı; Yönetmelik m.27

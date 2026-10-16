@@ -5,14 +5,17 @@ import { kesmeOzelAd } from './rules/kesme-ozel-ad.ts';
 import { ciftBosluk, noktalamaOncesiBosluk, noktalamaSonrasiBosluk } from './rules/bosluk-noktalama.ts';
 import { kelimeTekrari } from './rules/tekrar.ts';
 import { yayginYanlislar } from './rules/yaygin-yanlislar.ts';
-import { birlesikFiil } from './rules/birlesik-fiil.ts';
+import { birlesikFiil, birlesikFiilBitisik } from './rules/birlesik-fiil.ts';
 import { baglacKurallari, miUyum } from './rules/baglac.ts';
 import { buyukHarf } from './rules/buyuk-harf.ts';
+import { yazimSozluk } from './rules/yazim-sozluk.ts';
+import { YONETMELIK_RULES } from './rules/yonetmelik.ts';
 import { capitalizeTr, isLowerLetter } from './turkish.ts';
 
 export const DEFAULT_RULES: Rule[] = [
   yayginYanlislar,
   birlesikFiil,
+  birlesikFiilBitisik,
   baglacKurallari,
   miUyum,
   kesmeOzelAd,
@@ -22,10 +25,39 @@ export const DEFAULT_RULES: Rule[] = [
   ciftBosluk,
   kelimeTekrari,
   buyukHarf,
+  yazimSozluk,
+  ...YONETMELIK_RULES,
 ];
+
+/**
+ * Kuralların dayanağı (balonda gösterilir). Kural kendi dayanağını vermişse
+ * o kullanılır; vermemişse kimlik önekine göre buradan atanır.
+ */
+const REFS: Array<[prefix: string, ref: string]> = [
+  ['bosluk.', 'Yönetmelik m.16(3)'],
+  ['noktalama.', 'Yönetmelik m.16(3)'],
+  ['kesme.kurum', 'TDK Yazım Kılavuzu; Kılavuz §13.5'],
+  ['kesme.', 'TDK Yazım Kılavuzu (kesme işareti); Kılavuz §13.5'],
+  ['baglac.', 'TDK Yazım Kılavuzu; Kılavuz §13.6'],
+  ['yazim.birlesik-fiil', 'TDK Yazım Kılavuzu (birleşik fiiller); Kılavuz §13.6'],
+  ['yazim.sozluk', 'TDK Güncel Türkçe Sözlük (Yönetmelik m.16(8))'],
+  ['yazim.ayri', 'TDK Yazım Kılavuzu (bitişik/ayrı yazım)'],
+  ['yazim.yaygin', 'TDK Güncel Türkçe Sözlük'],
+  ['buyuk-harf.', 'TDK Yazım Kılavuzu (büyük harf)'],
+  ['tekrar.', 'Yazım'],
+];
+function withRef(i: Issue): Issue {
+  if (i.ref) return i;
+  const hit = REFS.find(([p]) => i.ruleId.startsWith(p));
+  return hit ? { ...i, ref: hit[1] } : i;
+}
 
 const RANK: Record<Severity, number> = { hata: 0, uyari: 1, oneri: 2 };
 const CAPITAL_RULE = 'buyuk-harf.cumle-basi';
+
+/** Genel sözlük kuralı, aynı yeri açıklayan özel bir kural varsa geri çekilir */
+const GENERIC = new Set(['yazim.sozluk', 'yazim.ayri']);
+const generic = (i: Issue) => (GENERIC.has(i.ruleId) || i.ruleId.endsWith('.morf') ? 1 : 0);
 
 /**
  * Çakışan sorunlardan yalnızca biri gösterilir: aynı aralığa iki öneri
@@ -39,7 +71,11 @@ const CAPITAL_RULE = 'buyuk-harf.cumle-basi';
  */
 function resolveOverlaps(issues: Issue[]): Issue[] {
   const sorted = [...issues].sort(
-    (a, b) => RANK[a.severity] - RANK[b.severity] || a.start - b.start || a.end - a.start - (b.end - b.start),
+    (a, b) =>
+      generic(a) - generic(b) ||
+      RANK[a.severity] - RANK[b.severity] ||
+      a.start - b.start ||
+      a.end - a.start - (b.end - b.start),
   );
   const kept: Issue[] = [];
   const dropped: Issue[] = [];
@@ -77,6 +113,11 @@ export function check(text: string, opts: CheckOptions = {}): Issue[] {
       console.warn(`[ebys-yazim] kural hatası: ${rule.id}`, err);
     }
   }
-  const visible = opts.ignored ? all.filter((i) => !opts.ignored!.has(fingerprint(i))) : all;
-  return resolveOverlaps(visible);
+  // Yoksayılan bir kelime, aynı metni işaretleyen genel kurallardan da düşer:
+  // kullanıcı "yanlız"ı yoksaydıysa sözlük kuralı onu yeniden işaretlememeli.
+  const ignoredTexts = new Set([...(opts.ignored ?? [])].map((f) => f.slice(f.indexOf('|') + 1)));
+  const visible = opts.ignored
+    ? all.filter((i) => !opts.ignored!.has(fingerprint(i)) && !(generic(i) && ignoredTexts.has(i.text)))
+    : all;
+  return resolveOverlaps(visible).map(withRef);
 }

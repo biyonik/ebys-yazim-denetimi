@@ -23,7 +23,10 @@ interface Entry {
   right: string[];
   severity?: Severity;
   note?: string;
+  ref?: string;
 }
+
+const KIL = 'Kılavuz s.54, sık yanlış kullanılan kelimeler';
 
 const ENTRIES: Entry[] = [
   { wrong: 'yanlız', right: ['yalnız'] },
@@ -72,7 +75,42 @@ const ENTRIES: Entry[] = [
   { wrong: 'metod', right: ['metot'] },
   { wrong: 'zerafet', right: ['zarafet'] },
   { wrong: 'bilimum', right: ['bilumum'] },
-  { wrong: 'ünvan', right: ['unvan'] },
+  {
+    wrong: 'ünvan',
+    right: ['unvan'],
+    note: 'Doğru yazımı: “unvan” (TDK). Not: Kılavuz bu kelimede TDK’den ayrılıyor; Yönetmelik m.16(8) TDK’yi esas alır.',
+  },
+  // ── Kılavuz tablosu (Cumhurbaşkanlığı, Şubat 2025) ──
+  // Bilinçli olarak alınmayanlar: "Unvan→Ünvan" (TDK'ye aykırı; Yönetmelik m.16(8) TDK'yi
+  // esas alır), "Direk→Direkt" (direk: sütun anlamıyla doğru kelime).
+  ...[
+    ['acenta', 'acente'], ['ardarda', 'art arda'], ['askari', 'asgari'], ['asvalt', 'asfalt'],
+    ['ahçı', 'aşçı'], ['aşcı', 'aşçı'], ['ayrıyeten', 'ayrıca'], ['ayrıyetten', 'ayrıca'],
+    ['azerbeycan', 'Azerbaycan'], ['burda', 'burada'], ['deyinmek', 'değinmek'], ['diyaspora', 'diaspora'],
+    ['döndermek', 'döndürmek'], ['erezyon', 'erozyon'], ['harfiyat', 'hafriyat'], ['hastahane', 'hastane'],
+    ['hizmetiçi', 'hizmet içi'], ['hukuğu', 'hukuku'], ['insiyatif', 'inisiyatif'], ['işbirliği', 'iş birliği'],
+    ['itibariyle', 'itibarıyla'], ['izalasyon', 'izolasyon'], ['kırahathane', 'kıraathane'], ['krathane', 'kıraathane'],
+    ['kominikasyon', 'komünikasyon'], ['komünükasyon', 'komünikasyon'], ['küsür', 'küsur'], ['labratuvar', 'laboratuvar'],
+    ['labaratuar', 'laboratuvar'], ['mataryel', 'materyal'], ['mebla', 'meblağ'], ['method', 'metot'],
+    ['mezkür', 'mezkûr'], ['meskür', 'mezkûr'], ['muhattap', 'muhatap'], ['mütevazi', 'mütevazı'],
+    ['mühled', 'mühlet'], ['mütaakip', 'müteakip'], ['nufüs', 'nüfus'], ['ortadoğu', 'Orta Doğu'],
+    ['öğe', 'öge'], ['parağraf', 'paragraf'], ['parakende', 'perakende'], ['proğram', 'program'],
+    ['rakkam', 'rakam'], ['satınalma', 'satın alma'], ['sebeb', 'sebep'], ['seyehat', 'seyahat'],
+    ['sezeryan', 'sezaryen'], ['şifai', 'şifahi'], ['sözkonusu', 'söz konusu'], ['sipiker', 'spiker'],
+    ['tahüt', 'taahhüt'], ['taktir', 'takdir'], ['tasviye', 'tasfiye'], ['tastik', 'tasdik'],
+    ['tebli', 'tebliğ'], ['tebellü', 'tebellüğ'], ['tensib', 'tensip'], ['tesbit', 'tespit'],
+    ['teşfik', 'teşvik'], ['taşaron', 'taşeron'], ['ultimatom', 'ültimatom'], ['ültümaton', 'ültimatom'],
+    ['ünüverste', 'üniversite'], ['ünversite', 'üniversite'], ['uslup', 'üslup'], ['üzre', 'üzere'],
+    ['yeralmak', 'yer almak'], ['yövmiye', 'yevmiye'], ['yurtiçi', 'yurt içi'], ['yurtdışı', 'yurt dışı'],
+    ['yasadışı', 'yasa dışı'], ['gecekondu', 'gecekondu'],
+  ]
+    .filter(([w, r]) => w !== r)
+    .map(([wrong, right]): Entry => ({ wrong: wrong!, right: [right!], ref: KIL })),
+  { wrong: 'tekrardan', right: ['tekrar'], severity: 'uyari', note: '"Tekrardan" yerine "tekrar" yeterlidir.', ref: KIL },
+  { wrong: 'evraklar', right: ['evrak'], severity: 'uyari', note: '"Evrak" zaten çokluk bildirir; çokluk eki gereksizdir.', ref: KIL },
+  { wrong: 'mevzuatlar', right: ['mevzuat'], severity: 'uyari', note: '"Mevzuat" zaten çokluk bildirir; çokluk eki gereksizdir.', ref: KIL },
+  { wrong: 'personeller', right: ['personel'], severity: 'uyari', note: '"Personel" topluluk adıdır; çokluk eki gereksizdir.', ref: KIL },
+  { wrong: 'yükseköğrenim', right: ['yükseköğretim'], severity: 'uyari', note: 'Kurum ve mevzuat adlarında "Yükseköğretim" kullanılır.', ref: KIL },
   // Bağlama bağlı: iki anlamlı kelimeler — kesin hata değil
   {
     wrong: 'hala',
@@ -95,6 +133,17 @@ const PHRASES: Entry[] = [
   { wrong: 'bir kaç', right: ['birkaç'] },
   { wrong: 'bir biri', right: ['birbiri'] },
   { wrong: 'tabi ki', right: ['tabii ki'] },
+  { wrong: 'alt yapı', right: ['altyapı'], ref: KIL },
+  { wrong: 'baş hekim', right: ['başhekim'], ref: KIL },
+  { wrong: 'gece kondu', right: ['gecekondu'], ref: KIL },
+  { wrong: 'milletler arası', right: ['milletlerarası'], ref: KIL },
+  { wrong: 'olağan üstü', right: ['olağanüstü'], ref: KIL },
+  { wrong: 'suç üstü', right: ['suçüstü'], ref: KIL },
+  { wrong: 've ya', right: ['veya'], ref: KIL },
+  { wrong: 'yüksek öğretim', right: ['yükseköğretim'], ref: KIL },
+  { wrong: 'bir takım', right: ['birtakım'], severity: 'uyari', note: '"Bazı, birkaç" anlamındaysa bitişik: "birtakım". "Bir takım oyuncu" anlamında ayrı yazım doğrudur.', ref: KIL },
+  { wrong: 'bu gün', right: ['bugün'], severity: 'uyari', note: '"İçinde bulunulan gün" anlamında bitişik yazılır: "bugün".', ref: KIL },
+  { wrong: 'göz altı', right: ['gözaltı'], severity: 'uyari', note: 'Hukuki terim anlamında bitişik yazılır: "gözaltı".', ref: KIL },
   {
     wrong: 'bir çok',
     right: ['birçok'],
@@ -117,6 +166,12 @@ function stemSafe(e: Entry): boolean {
 const EXACT = new Map(ENTRIES.map((e) => [e.wrong, e]));
 const STEMS = ENTRIES.filter((e) => !e.severity && stemSafe(e)).sort((a, b) => b.wrong.length - a.wrong.length);
 const PHRASE_MAP = new Map(PHRASES.map((e) => [e.wrong, e]));
+/** İlk harfe göre indeks: her kelimede tüm gövdeleri taramamak için */
+const STEMS_BY_INITIAL = new Map<string, Entry[]>();
+for (const e of STEMS) {
+  const k = e.wrong[0]!;
+  STEMS_BY_INITIAL.set(k, [...(STEMS_BY_INITIAL.get(k) ?? []), e]);
+}
 
 function makeIssue(start: number, end: number, text: string, e: Entry, rights: string[]): Issue {
   return {
@@ -128,6 +183,7 @@ function makeIssue(start: number, end: number, text: string, e: Entry, rights: s
     severity: e.severity ?? 'hata',
     category: 'yazim',
     suggestions: rights.map((r) => matchCase(text, r)),
+    ...(e.ref ? { ref: e.ref } : {}),
   };
 }
 
@@ -160,7 +216,7 @@ export const yayginYanlislar: Rule = {
       }
 
       // Kesme işaretli özel ad eki ("Orjinal'den") gövdeyi ayırır; yalnızca gövdeye bak
-      for (const e of STEMS) {
+      for (const e of STEMS_BY_INITIAL.get(w[0]!) ?? []) {
         if (!w.startsWith(e.wrong)) continue;
         const rest = w.slice(e.wrong.length);
         if (rest.length === 0 || rest.length > 10 || !/^['’]?\p{Ll}+$/u.test(rest)) continue;

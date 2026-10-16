@@ -14,6 +14,7 @@
  */
 import { EVT_EVENT, type BridgeEvent } from '../shared/protocol.ts';
 import { EditorSession } from './session.ts';
+import { warmUp } from '../core/morph/analyzer.ts';
 
 const sessions = new Map<HTMLIFrameElement, EditorSession>();
 
@@ -81,3 +82,11 @@ window.addEventListener('resize', reposition, { passive: true });
 window.addEventListener('scroll', reposition, { passive: true, capture: true });
 
 scan();
+
+// Sözlüğü (~35 bin kök) sayfa boştayken yükle: ilk denetim kullanıcıyı bekletmesin.
+// Editör yoksa hiç yükleme — eklenti EBYS'nin editörsüz sayfalarında iz bırakmaz.
+const idle = (cb: () => void) =>
+  'requestIdleCallback' in window ? requestIdleCallback(cb, { timeout: 3000 }) : setTimeout(cb, 500);
+idle(() => {
+  if (document.querySelector('iframe.cke_wysiwyg_frame')) warmUp();
+});

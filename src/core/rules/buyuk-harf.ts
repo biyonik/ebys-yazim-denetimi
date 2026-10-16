@@ -12,7 +12,7 @@ import { capitalizeTr, isLowerLetter, trLower } from '../turkish.ts';
  *  - Tablo hücresi başı ("adet", "kg") cümle başı değildir
  *  - Madde imleri: "a) Toplantı", "b. Rapor"
  */
-const ABBREVIATIONS = new Set([
+export const ABBREVIATIONS = new Set([
   'vb', 'vs', 'bkz', 'hk', 'örn', 'dr', 'prof', 'doç', 'av', 'sn', 'no', 'nu', 'md', 'mad',
   's', 'sy', 'sf', 'yy', 'yb', 'ltd', 'şti', 'alb', 'yzb', 'bşk', 'gn', 'gnl', 'müd',
   'uzm', 'öğr', 'gör', 'mah', 'cad', 'sok', 'apt', 'bul', 'tel', 'fax', 'faks', 'vd',
@@ -50,7 +50,9 @@ export const buyukHarf: Rule = {
         const first = t.text[0]!;
         const next = tokens[i + 1];
         const isListMarker = t.text.length === 1 && (next?.text === ')' || next?.text === '.');
-        if (isLowerLetter(first) && !isListMarker) {
+        // e-Yazışma, e-imza, e-posta: tek harfli ön ek
+        const isPrefix = t.text.length === 1 && next?.text === '-' && next.start === t.end;
+        if (isLowerLetter(first) && !isListMarker && !isPrefix) {
           issues.push({
             ruleId: 'buyuk-harf.cumle-basi',
             start: t.start,

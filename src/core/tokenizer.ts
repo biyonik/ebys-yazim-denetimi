@@ -1,10 +1,12 @@
 import type { Token, TokenKind } from './types.ts';
 
 /**
- * Sıra önemlidir: önce ayırıcı, sonra boşluk, sonra sayı (eki dahil),
+ * Sıra önemlidir: önce URL ve e-posta (tek, dokunulmaz parça: içindeki
+ * "gov", "tr", "MevzuatNo" kelime sayılmaz), sonra ayırıcı, sonra boşluk, sonra sayı (eki dahil),
  * sonra kelime (kesmeli eki dahil), en son tek karakterlik noktalama.
  *
- * Sayı grubu "2026da", "2026'da", "16.10.2026'da", "10:30", "2,5" gibi
+ * Sayı grubu yalnızca ASCII rakamları kapsar (\p{N} "²", "½" gibi karakterleri de
+ * içerir ve sayı okuma mantığını bozar). "2026da", "2026'da", "16.10.2026'da", "10:30", "2,5" gibi
  * biçimleri tek token olarak yakalar; böylece kesme kuralı sayıyı ve ekini
  * birlikte görür.
  *
@@ -12,9 +14,9 @@ import type { Token, TokenKind } from './types.ts';
  * yapıştırılan metinlerde ikincisi çok yaygındır.
  */
 const RE =
-  /([\n\t])|([  ]+)|(\p{N}+(?:[.,:/]\p{N}+)*(?:['’]?\p{L}+)?)|(\p{L}[\p{L}\p{M}]*(?:['’]\p{L}[\p{L}\p{M}]*)*)|([^\s\p{L}\p{N}])|(\s)/gu;
+  /((?:https?:\/\/|www\.)[^\s<>"“”]+[^\s<>"“”.,;:!?)]|[\p{L}\p{N}._%+-]+@[\p{L}\p{N}.-]+\.\p{L}{2,})|([\n\t])|([ \u00A0]+)|([0-9]+(?:[.,:/][0-9]+)*(?:['’]?\p{L}+)?)|(\p{L}[\p{L}\p{M}]*(?:['’]\p{L}[\p{L}\p{M}]*)*)|([^\s\p{L}\p{N}])|(\s)/gu;
 
-const KINDS: TokenKind[] = ['break', 'space', 'number', 'word', 'punct', 'space'];
+const KINDS: TokenKind[] = ['other', 'break', 'space', 'number', 'word', 'punct', 'space'];
 
 export function tokenize(text: string): Token[] {
   const out: Token[] = [];
@@ -28,7 +30,7 @@ export function tokenize(text: string): Token[] {
         break;
       }
     }
-    if (m[0] === '￼') kind = 'other';
+    if (m[0] === '\uFFFC') kind = 'other';
     out.push({ kind, text: m[0], start: m.index, end: m.index + m[0].length });
   }
   return out;
@@ -43,4 +45,15 @@ export function nextNonSpace(tokens: Token[], i: number): Token | undefined {
 export function prevNonSpace(tokens: Token[], i: number): Token | undefined {
   for (let j = i - 1; j >= 0; j--) if (tokens[j]!.kind !== 'space') return tokens[j];
   return undefined;
+}
+
+/** i'deki token cümle (ya da paragraf) başında mı */
+export function isSentenceStart(tokens: Token[], i: number): boolean {
+  for (let j = i - 1; j >= 0; j--) {
+    const t = tokens[j]!;
+    if (t.kind === 'space') continue;
+    if (t.kind === 'break') return true;
+    return t.kind === 'punct' && (t.text === '.' || t.text === '!' || t.text === '?' || t.text === ':');
+  }
+  return true;
 }

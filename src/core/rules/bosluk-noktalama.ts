@@ -94,7 +94,9 @@ export const noktalamaSonrasiBosluk: Rule = {
       if (prev.kind !== 'word' && prev.kind !== 'number') continue;
 
       let applies = false;
-      if (p.text === ',' || p.text === ';') applies = true;
+      // Tek harfli liste: (B,C), A,B ve C
+      const singleLetters = prev.kind === 'word' && prev.text.length === 1 && next.text.length === 1;
+      if ((p.text === ',' || p.text === ';') && !singleLetters) applies = true;
       else if (p.text === ':') applies = true; // "https://" → ':' sonrası '/' gelir, kelime değil
       else if (p.text === '.' || p.text === '!' || p.text === '?') {
         // Kısaltma zinciri (T.C., A.Ş.) ve alan adı (kurum.gov.tr) hariç

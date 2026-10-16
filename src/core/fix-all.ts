@@ -11,13 +11,14 @@ import { check, type CheckOptions } from './engine.ts';
  *   öneri + tek öneri   → uygulanır      (çift boşluk, 5km → 5 km)
  *   uyari               → ASLA           (hala → hâlâ mı? bende → ben de mi?)
  *   birden çok öneri    → ASLA           (6'ı → 6'yı mı 6'sı mı?)
+ *   tahmin (autoFix:false) → ASLA        (sözlükte olmayan kelimeye yakın aday)
  *
  * Uyarıları toplu uygulamak, yazanın kastettiği anlamı sessizce değiştirmek
  * demektir. "Dosya bende kalsın" cümlesi "Dosya ben de kalsın" olur ve
  * imzalanıp gönderilir.
  */
 export function isAutoFixable(i: Issue): boolean {
-  return i.severity !== 'uyari' && i.suggestions.length === 1;
+  return i.severity !== 'uyari' && i.suggestions.length === 1 && i.autoFix !== false;
 }
 
 /**

@@ -12,8 +12,9 @@ import { OBJ_CHAR, SEP_BLOCK, SEP_CELL } from '../core/types.ts';
  *       girinti "çift boşluk" hatası gibi görünür.
  *     - &nbsp; boşluk olarak sayılır ve ASLA birleştirilmez; CKEditor kullanıcının
  *       bastığı ikinci boşluğu &nbsp; olarak saklar.
- *     - CKEditor'ün imleç dolgu karakterleri (U+200B dizisi) ve U+FEFF yok sayılır.
- *       Aksi hâlde "ev​de" iki kelime görünür.
+ *     - CKEditor'ün imleç dolgu karakterleri (U+200B dizisi), U+FEFF ve yumuşak tire
+ *       (U+00AD, PDF/Word'den yapıştırmada) yok sayılır.
+ *       Aksi hâlde "ev\u200Bde" iki kelime görünür.
  *  2. Her düz metin ofseti, geri dönüşte tam olarak bir (TextNode, ofset)
  *     çiftine karşılık gelir.
  */
@@ -25,7 +26,8 @@ const BLOCK = new Set([
 ]);
 const CELL = new Set(['TD', 'TH']);
 const SKIP = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'IFRAME', 'OBJECT', 'SVG']);
-const IGNORED_CHARS = /[​﻿]/;
+// U+200B/U+FEFF: CKEditor imleç dolgusu · U+00AD: yumuşak tire (PDF/Word'den yapıştırmada çok yaygın)
+const IGNORED_CHARS = /[\u200B\uFEFF\u00AD]/;
 const COLLAPSIBLE = /[ \t\n\r\f]/;
 
 interface Segment {
@@ -89,7 +91,7 @@ export class TextIndex {
         for (let i = 0; i < data.length; i++) {
           const ch = data[i]!;
           if (IGNORED_CHARS.test(ch)) continue;
-          if (ch === ' ') {
+          if (ch === '\u00A0') {
             out += ' ';
             map.push(i);
           } else if (COLLAPSIBLE.test(ch)) {

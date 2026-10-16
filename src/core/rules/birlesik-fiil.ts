@@ -18,7 +18,7 @@ import { matchCase, trLower } from '../turkish.ts';
 const ROOTS = [
   'arz', 'rica', 'kabul', 'teşekkür', 'tebliğ', 'tahsis', 'talep', 'teslim',
   'tespit', 'ilan', 'iade', 'iptal', 'kontrol', 'takdim', 'tavsiye', 'teklif',
-  'temin', 'tercih', 'tasdik', 'tayin', 'ihmal', 'tahmin', 'tavzih', 'terfi',
+  'temin', 'tercih', 'tasdik', 'tayin', 'ihmal', 'tahmin', 'tavzih', 'terfi', 'sevk',
 ];
 const AUX = /^(et|ed|ol|eyle)/;
 
@@ -48,6 +48,51 @@ export const birlesikFiil: Rule = {
         });
         break;
       }
+    }
+    return issues;
+  },
+};
+
+/**
+ * Ters yön: ses olayı VARSA bitişik yazılır (TDK; Kılavuz tablosu).
+ *   kayıt etmek → kaydetmek, fesih etmek → feshetmek, red etmek → reddetmek
+ * Anahtar: ayrı yazılmış isim, değer: bitişik yazımda aldığı gövde.
+ */
+const FUSED: Record<string, string> = {
+  kayıt: 'kayded', fesih: 'feshed', lağv: 'lağved', derc: 'dercet', red: 'redded', ret: 'redded',
+  af: 'affed', his: 'hissed', kayıp: 'kaybed', seyir: 'seyred', zan: 'zanned', hal: 'halled',
+  keşif: 'keşfed', nakil: 'nakled', emir: 'emred', hüküm: 'hükmed', şükür: 'şükred', sabır: 'sabred',
+};
+
+export const birlesikFiilBitisik: Rule = {
+  id: 'yazim.birlesik-fiil-bitisik',
+  check({ tokens }) {
+    const issues: Issue[] = [];
+    for (let i = 0; i + 2 < tokens.length; i++) {
+      const a = tokens[i]!;
+      const sp = tokens[i + 1]!;
+      const b = tokens[i + 2]!;
+      if (a.kind !== 'word' || sp.kind !== 'space' || b.kind !== 'word') continue;
+      const stem = FUSED[trLower(a.text)];
+      if (!stem) continue;
+      // "etmek / edilmek / eyle" çekimleri: et-, ed-
+      const bw = trLower(b.text);
+      const m = /^(et|ed)(.*)$/.exec(bw);
+      if (!m) continue;
+      // Gövde ünsüzle bitiyorsa (kayded-) ünlüyle başlayan ek doğrudan gelir; "et" → "ed" yumuşaması korunur
+      const rest = m[1] === 'et' ? 'et' + m[2] : 'ed' + m[2];
+      const fused = stem.slice(0, -2) + rest;
+      issues.push({
+        ruleId: 'yazim.birlesik-fiil-bitisik',
+        start: a.start,
+        end: b.end,
+        text: a.text + sp.text + b.text,
+        message: `Kaynaşma sırasında ses olayı olduğu için bitişik yazılır: “${matchCase(a.text, fused)}”.`,
+        severity: 'hata',
+        category: 'kural',
+        suggestions: [matchCase(a.text, fused)],
+        ref: 'TDK Yazım Kılavuzu; Kılavuz s.54',
+      });
     }
     return issues;
   },

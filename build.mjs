@@ -20,6 +20,7 @@ await build({
   minify: !dev,
   sourcemap: dev ? 'inline' : false,
   legalComments: 'none',
+  define: { __DEV__: dev ? 'true' : 'false' },
   logLevel: 'warning',
 });
 
@@ -49,4 +50,12 @@ const manifest = {
   ],
 };
 writeFileSync('dist/manifest.json', JSON.stringify(manifest, null, 2));
+
+// Apache-2.0: türetilmiş sözlük verisiyle birlikte lisans metni ve atıf dağıtılır
+writeFileSync(
+  'dist/THIRD_PARTY_LICENSES.txt',
+  'Bu eklentinin Türkçe kök sözlüğü Zemberek-NLP sözlük dosyalarından türetilmiştir.\n' +
+    'https://github.com/ahmetaa/zemberek-nlp — Copyright 2018 Ahmet A. Akın, Mehmet D. Akın\n\n' +
+    readFileSync('vendor/zemberek/LICENSE', 'utf8'),
+);
 console.log(`dist/ hazır (${dev ? 'dev' : 'prod'}) — adresler: ${matches.join(', ')}`);

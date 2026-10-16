@@ -1,6 +1,8 @@
 import type { Issue, Rule, Severity, Token } from '../types.ts';
 import { INSTITUTION_HEADS, PROPER_NOUNS } from '../lexicon/ozel-adlar.ts';
 import { checkSuffix } from '../suffix.ts';
+import { isSentenceStart } from '../tokenizer.ts';
+import { isValidWord } from '../morph/analyzer.ts';
 import { isUpperLetter, matchCase, trLower } from '../turkish.ts';
 
 /**
@@ -20,18 +22,8 @@ const INFLECTION =
 
 const APOS = /['’]/;
 
-function isSentenceStart(tokens: Token[], i: number): boolean {
-  for (let j = i - 1; j >= 0; j--) {
-    const t = tokens[j]!;
-    if (t.kind === 'space') continue;
-    if (t.kind === 'break') return true;
-    return t.kind === 'punct' && (t.text === '.' || t.text === '!' || t.text === '?' || t.text === ':');
-  }
-  return true;
-}
-
 /** Kelimenin başındaki en uzun özel adı bulur. */
-function longestProperPrefix(w: string): { stem: string; rest: string } | null {
+export function longestProperPrefix(w: string): { stem: string; rest: string } | null {
   for (let len = w.length - 1; len >= 2; len--) {
     const stem = w.slice(0, len);
     if (PROPER_NOUNS.has(stem)) return { stem, rest: w.slice(len) };
@@ -87,6 +79,9 @@ export const kesmeOzelAd: Rule = {
       if (PROPER_NOUNS.has(w)) continue; // "Emine", "Denizli": kendisi ad
       const hit = longestProperPrefix(w);
       if (!hit || !INFLECTION.test(hit.rest)) continue;
+      // Kelime cins isim olarak da çözümlenebiliyorsa özel ad varsayma:
+      // "Metindeki" (metin = yazı), "Aslı gibidir", "Onur Kurulunda", "Denizde"
+      if (isValidWord(w)) continue;
       const pn = PROPER_NOUNS.get(hit.stem)!;
       if (pn.ambiguous && atStart) continue; // "Denizde yüzdük." ayırt edilemez
 

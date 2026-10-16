@@ -110,9 +110,18 @@ export class EditorSession {
       this.positionBadge();
       return;
     }
+    const t0 = performance.now();
     this.index = TextIndex.build(this.body);
+    const t1 = performance.now();
     this.issues = check(this.index.text, { ignored });
+    const t2 = performance.now();
     this.highlighter.render(this.index, this.issues);
+    if (__DEV__) {
+      const words = this.index.text.split(/\s+/).length;
+      const info = `${words} kelime · indeks ${(t1 - t0).toFixed(1)} ms · kurallar ${(t2 - t1).toFixed(1)} ms · işaretleme ${(performance.now() - t2).toFixed(1)} ms · ${this.issues.length} sorun`;
+      console.debug(`[ebys-yazim] denetim: ${info}`);
+      this.ui.setDebugTiming(info);
+    }
     // Açık balonun sorunu artık yoksa kapat
     const open = this.ui.openIssue;
     if (open && !this.issues.some((i) => i.start === open.start && fingerprint(i) === fingerprint(open))) {

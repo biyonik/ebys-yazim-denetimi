@@ -42,6 +42,11 @@ export function spokenLastWord(numberBody: string): string {
     groups[0]!.length <= 3;
 
   if (isThousands) return lastWordOfInteger(groups.join(''));
+  // Saat: sondaki sıfır grubu okunmaz — 11.00 "on bir", 10:00 "on" (11.00'de, 10:00'da)
+  const last = groups[groups.length - 1]!;
+  if (groups.length > 1 && /^0+$/.test(last) && (seps.at(-1) === '.' || seps.at(-1) === ':')) {
+    return lastWordOfInteger(groups[groups.length - 2]!);
+  }
   // Tarih (16.10.2026), ondalık (2,5), saat (10:30): son grup okunur
-  return lastWordOfInteger(groups[groups.length - 1]!);
+  return lastWordOfInteger(last);
 }

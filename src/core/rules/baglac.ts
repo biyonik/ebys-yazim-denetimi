@@ -23,8 +23,9 @@ import { harmonize2, harmonize4, harmonyOf, lastVowel, matchCase, trLower } from
  *  3. BELİRSİZ ama yaygın: bende/sende/bizde → "ben de" mi, "bende (bende
  *     kalsın)" mı? Anlam gerekir; yalnızca uyarı.
  *
- * Açık sınıf isimler ve fiiller ("kitabıda", "geldide") kök sözlüğü olmadan
- * güvenle çözülemez; bunlar morfoloji motorunun (Faz 2) işidir.
+ * Açık sınıf isimler ve fiiller ("kitabıda", "geldide") için bu dosya yetmez;
+ * onları yazim-sozluk.ts çözer: kelime bütün hâliyle geçersiz, gövdesi
+ * geçerliyse sondaki ek bağlaçtır.
  */
 
 // ── de / da ─────────────────────────────────────────────────────────────
@@ -95,12 +96,6 @@ function deBaglaci(tokens: { kind: string; text: string; start: number; end: num
 const PERSON = '(?:[ıiuü]m|s[ıiuü]n|[ıiuü]z|s[ıiuü]n[ıiuü]z|l[ae]r|m|n|k|n[ıiuü]z)?';
 /** Çekimli fiil gövdesi + ki. -yor/-mış/-acak/-malı ile biten bir isim gövdesi yoktur. */
 const KI_VERB = new RegExp(`^(.+(?:yor|m[ıiuü]ş|[ae]c[ae]k|m[ae]l[ıi])${PERSON})k[iıuü]$`);
-/**
- * Geçmiş zaman (-dı) + ki: güçlü ama kesin değil. "-tik" ile biten alıntı
- * isimlerin yumuşamamış belirtme hâli ("plastiki") aynı biçime düşer;
- * bu yüzden uyarı düzeyinde.
- */
-const KI_PAST = new RegExp(`^(.+[dt][ıiuü]${PERSON})k[iıuü]$`);
 const KI_CLOSED = new Map([
   ['olurki', 'olur'], ['olmazki', 'olmaz'], ['derki', 'der'], ['değilki', 'değil'],
   ['varki', 'var'], ['yokki', 'yok'], ['gerekki', 'gerek'], ['gerekirki', 'gerekir'],
@@ -116,17 +111,10 @@ function kiBaglaci(tokens: { kind: string; text: string; start: number; end: num
     const w = trLower(t.text);
     if (KI_EXCEPTIONS.has(w) || w.length < 5) continue;
     let stem = KI_CLOSED.get(w);
-    let severity: Severity = 'hata';
+    const severity: Severity = 'hata';
     if (!stem) {
       const m = KI_VERB.exec(w);
       if (m && m[1]!.length >= 3) stem = m[1]!;
-    }
-    if (!stem) {
-      const m = KI_PAST.exec(w);
-      if (m && m[1]!.length >= 4) {
-        stem = m[1]!;
-        severity = 'uyari';
-      }
     }
     if (!stem) continue;
     issues.push({
@@ -152,7 +140,11 @@ const MI_CLOSED_STEMS = new Set([
   'var', 'yok', 'değil', 'olur', 'olmaz', 'tamam', 'doğru', 'öyle', 'böyle', 'şöyle',
   'mümkün', 'gerek', 'lazım', 'uygun', 'yeterli', 'gerekli',
 ]);
+const MI_ONLY = new RegExp(`^${MI_TAIL}$`);
 const MI_CLOSED = new RegExp(`^(${[...MI_CLOSED_STEMS].join('|')})${MI_TAIL}$`);
+
+/** Soru eki çekimine biçimce uyan ama gerçek kelime olanlar */
+const MI_LOOKALIKES = new Set(['müdür', 'mısır', 'misin']);
 
 /** Soru ekinin ünlüsünü gövdeye uydurur: "geliyormi" → "geliyor mu" */
 function harmonizeParticle(stem: string, particle: string): string {
@@ -211,7 +203,9 @@ export const miUyum: Rule = {
       const b = tokens[i + 2]!;
       if (a.kind !== 'word' || sp.kind !== 'space' || b.kind !== 'word') continue;
       const p = trLower(b.text);
-      if (!new RegExp(`^${MI_TAIL}$`).test(p)) continue;
+      // "Genel Müdür": müdür = "mü + dür" biçimine de uyar; büyük harfli kelime soru eki olamaz
+      if (b.text[0] !== p[0] || MI_LOOKALIKES.has(p)) continue;
+      if (!MI_ONLY.test(p)) continue;
       const fixed = harmonizeParticle(trLower(a.text), p);
       if (fixed === p) continue;
       issues.push({

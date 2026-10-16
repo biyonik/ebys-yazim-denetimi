@@ -16,7 +16,7 @@ import { trLower } from '../turkish.ts';
  */
 
 /** Sayıyla birleşik yazıldığında "ek" değil "birim" olan kısaltmalar */
-const UNITS = new Set([
+export const UNITS = new Set([
   'km', 'm', 'cm', 'mm', 'kg', 'g', 'mg', 'gr', 'lt', 'l', 'ml', 'cc',
   'TL', 'tl', 'kb', 'KB', 'mb', 'MB', 'gb', 'GB', 'tb', 'TB',
   'sn', 'dk', 'ha', 'kW', 'kw', 'kwh', 'kWh', 'mw', 'MW',
@@ -24,7 +24,7 @@ const UNITS = new Set([
   // madde/bent kodlarıyla çakışır.
 ]);
 
-const NUM_RE = /^([\p{N}]+(?:[.,:/][\p{N}]+)*)(['’]?)(\p{L}+)$/u;
+const NUM_RE = /^([0-9]+(?:[.,:/][0-9]+)*)(['’]?)(\p{L}+)$/u;
 
 export const kesmeSayi: Rule = {
   id: 'kesme.sayi',
@@ -50,6 +50,7 @@ export const kesmeSayi: Rule = {
         continue;
       }
       if (suffix !== trLower(suffix)) continue; // 2B, 4K: kod, ek değil
+      if (!/[aeıioöuü]/.test(suffix)) continue; // 210x297, 3D: ölçü/kod, ek değil
 
       const spoken = spokenLastWord(num);
       const sc = checkSuffix(spoken, suffix);

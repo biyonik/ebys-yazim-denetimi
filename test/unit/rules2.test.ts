@@ -101,3 +101,11 @@ test('kurum adlarına gelen ekler kesmesiz', () => {
 test('sayı: kaynaştırma ünsüzü ilgi hâlinde "n"', () => {
   assert.deepEqual(sug("2'in yarısı.", 'kesme.sayi'), [["2'in", "2'nin"]]);
 });
+
+test('gerçek metin bulguları: saat, URL, tek harfli liste', () => {
+  assert.deepEqual(only("Saat 11.00'de başlar, 09.45'te biter, 10:00'da toplanılır.", 'kesme'), []);
+  assert.deepEqual(sug("Saat 11.00'da başlar.", 'kesme.sayi'), [["11.00'da", "11.00'de"]]);
+  assert.deepEqual(check('Bkz. https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=8716&Tur=9 adresi.').map((i) => i.text), []);
+  assert.deepEqual(check('E-posta: ahmet.altun@kurum.gov.tr adresine yazınız.').map((i) => i.text), []);
+  assert.deepEqual(only('Birimler (B,C) ile koordinasyon sağlanır.', 'noktalama'), []);
+});

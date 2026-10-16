@@ -21,6 +21,14 @@ export interface Issue {
   severity: Severity;
   category: Category;
   suggestions: string[];
+  /**
+   * false: tek öneri olsa bile "Tümünü düzelt" uygulamaz. Tahmine dayalı
+   * önerilerde (düzenleme mesafesi) kullanılır: "gönderilmş" için tek aday
+   * bulunması, o adayın kastedilen kelime olduğunu garanti etmez.
+   */
+  autoFix?: boolean;
+  /** Dayanak: "Yönetmelik m.16(7)", "Kılavuz §13.6", "TDK Yazım Kılavuzu" — balonda gösterilir */
+  ref?: string;
 }
 
 export type TokenKind = 'word' | 'number' | 'punct' | 'space' | 'break' | 'other';
@@ -50,4 +58,4 @@ export interface Rule {
 export const SEP_BLOCK = '\n';
 export const SEP_CELL = '\t';
 /** contenteditable=false parçalar (ör. EBYS etiket alanları) için yer tutucu */
-export const OBJ_CHAR = '￼';
+export const OBJ_CHAR = '\uFFFC';

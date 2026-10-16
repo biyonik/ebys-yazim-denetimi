@@ -35,7 +35,7 @@ button { font: inherit; cursor: pointer; border-radius: 6px; color: inherit; }
 .row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f3f4; padding-top: 6px; }
 .ghost { background: none; border: 0; color: #5f6368; padding: 2px 4px; }
 .ghost:hover { color: #202124; text-decoration: underline; }
-.rule { color: #9aa0a6; font-size: 11px; }
+.rule { color: #80868b; font-size: 11px; text-align: right; max-width: 210px; }
 
 .badge {
   position: fixed; z-index: 2147483646; font: 600 12px/1 system-ui, "Segoe UI", Arial, sans-serif;
@@ -131,6 +131,11 @@ export class EditorUi {
     return e;
   }
 
+  /** Geliştirme derlemesinde son denetimin süresi (testler okur); üretimde çağrılmaz */
+  setDebugTiming(info: string): void {
+    this.host.setAttribute('data-son-denetim', info);
+  }
+
   get isOpen(): boolean {
     return this.pop !== null;
   }
@@ -185,7 +190,9 @@ export class EditorUi {
     const row = this.el('div', 'row');
     const ignore = this.el('button', 'ghost', 'Yoksay');
     ignore.addEventListener('click', () => h.onIgnore(issue));
-    row.append(ignore, this.el('span', 'rule', issue.ruleId));
+    const ref = this.el('span', 'rule', issue.ref ?? issue.ruleId);
+    ref.title = issue.ruleId;
+    row.append(ignore, ref);
 
     pop.append(sev, msg, sugs, row);
     pop.addEventListener('keydown', (e) => {

@@ -93,7 +93,7 @@ test('noktalama boşlukları', () => {
   assert.equal(firstSuggestion('Evet , olur.'), ',');
   assert.equal(firstSuggestion('Evet,olur.'), ', olur');
   // Başlık hizalaması ve alan adları işaretlenmez
-  assert.deepEqual(ids('Sayı    : E-12345\nKonu    : Görüş talebi'), []);
+  assert.deepEqual(ids('Sayı    : E-67915368-903.07.02-4752\nKonu    : Görüş Talebi'), []);
   assert.deepEqual(ids('Adres: kurum.gov.tr üzerinden.'), []);
   assert.deepEqual(ids('T.C. Ankara Valiliği'), []);
 });
