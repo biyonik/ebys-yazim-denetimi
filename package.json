@@ -10,8 +10,15 @@
     "test:e2e": "node build.mjs --dev && python3 test/e2e/run.py"
   },
   "author": "Ahmet ALTUN <ahmet.altun60@gmail.com> (https://biyonik.github.io)",
-  "homepage": "https://biyonik.github.io",
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/biyonik/ebys-yazim-denetimi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biyonik/ebys-yazim-denetimi.git"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "^26.6.5",
     "ckeditor4": "^4.22.1",

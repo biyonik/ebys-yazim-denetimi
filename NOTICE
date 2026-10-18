@@ -1,0 +1,21 @@
+EBYS Yazım Denetimi
+Copyright 2026 Ahmet ALTUN
+
+Bu ürün Apache License 2.0 ile lisanslanmıştır (bkz. LICENSE).
+
+Üçüncü taraf bileşenler
+-----------------------
+
+Zemberek-NLP sözlük dosyaları (vendor/zemberek/, türetilmiş veri: src/core/morph/data/)
+  https://github.com/ahmetaa/zemberek-nlp
+  Copyright 2018 Ahmet A. Akın, Mehmet D. Akın
+  Apache License 2.0
+
+Dayanak belgeler (assets/kaynak/) — bu deponun lisansı KAPSAMINDA DEĞİLDİR
+  - Resmî Yazışmalarda Uygulanacak Usul ve Esaslar Hakkında Yönetmelik
+    (Cumhurbaşkanı Kararı 2646, Resmî Gazete 10.06.2020/31151, ekleriyle)
+  - Resmî Yazışma Kuralları Kılavuzu, Ocak 2023 baskısı
+    (T.C. Cumhurbaşkanlığı)
+  Kamuya açık resmî yayımlardır; eklentide başvuru amacıyla, içeriği değiştirilmeden
+  (Kılavuz yalnızca kayıpsız yeniden sıkıştırılarak) yer alır. Tüm hakları yayımlayan
+  kuruma aittir.

@@ -45,6 +45,8 @@ for (const f of ['content.js', 'bridge.js', 'background.js', 'popup.js']) {
 cpSync('assets/icons', 'dist/icons', { recursive: true, filter: (p) => !p.replaceAll('\\', '/').includes('/kaynak') });
 cpSync('assets/kaynak', 'dist/kaynak', { recursive: true });
 cpSync('src/popup/popup.html', 'dist/popup.html');
+cpSync('LICENSE', 'dist/LICENSE');
+cpSync('NOTICE', 'dist/NOTICE');
 
 const ICONS = { 16: 'icons/icon-16.png', 32: 'icons/icon-32.png', 48: 'icons/icon-48.png', 128: 'icons/icon-128.png' };
 const manifest = {
