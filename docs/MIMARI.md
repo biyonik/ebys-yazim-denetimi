@@ -132,6 +132,21 @@ Tarayıcıda, eklenti içinde ölçülen süreler (`npm run test:e2e`, 1.600 kel
 
 Bütçe 50 ms'ydi. Paket boyutu: `content.js` 558 KB (sözlük dahil).
 
+## 5b. Tıklanabilir dayanak
+
+Uyarının dayanağı ("Yönetmelik m.16(4), Kılavuz §31") `ref-links.ts` ile parçalanır; tanınan her atıf, eklentinin
+**kendi içinde taşıdığı** PDF'e (`dist/kaynak/`) `#page=N` ile bağlanır. Atıf → sayfa dizini PDF'lerden betikle
+üretilir (`scripts/build-ref-index.py`): Kılavuz'da bölüm başlıkları, Yönetmelik'te madde ve **fıkra** başlangıçları.
+
+| Karar | Neden | Alternatif ve bedeli |
+|---|---|---|
+| PDF'ler pakette | Ağ yok (eklentinin temel güvencesi), sürüm sabit (Ocak 2023), EBYS ağları çoğu zaman kısıtlı | Resmî siteye bağlantı: adres ve baskı değişir (2025 baskısının sayfaları farklı), ağ ister |
+| Açma işi arka planda (`chrome.tabs.create`) | İzin istemez; PDF'ler `web_accessible_resources` olmaz, yani EBYS sayfası eklentiyi bu dosyalardan tespit edemez | İçerik betiğinden `window.open`: dosyaları tüm sitelere açmak gerekir |
+| Bilinmeyen alt bölüm → üst bölüm, o da yoksa bağlantı yok | Yanlış sayfaya götürmek, götürmemekten kötüdür | — |
+| Kılavuz PDF'i kayıpsız sıkıştırıldı (11,6 → 10,3 MB) | Görsel yeniden örnekleme denendi: 4,5 MB'a iniyor ama bir sayfanın metni kayboldu | Kayıplı sıkıştırma: boyut kazancı, içerik bozulması riski |
+
+Arka plan mesajı yalnızca `{belge, sayfa}` taşır, belge adı beyaz listeden, sayfa aralıktan doğrulanır.
+
 ## 6. CKEditor 4 entegrasyonunda öğrendiklerimiz
 
 1. **Belge yeniden yazılır.** `setData()` ve kaynak modundan dönüş iframe belgesini yeniden oluşturur. Her denetim döngüsünde belge kimliği doğrulanır; köprüden `contentDom` olayı da gelir.
@@ -261,4 +276,4 @@ Bu fazlar bir "MVP sonra genişlet" planı değil; tek bir bütün ürünün in�
 1. **EBYS'nin gerçek adresi** (`ebys.config.json`).
 2. **Kurum bilgisayarlarındaki Chrome sürümü.** `world: "MAIN"` Chrome 111 ister. Windows 7/8.1'de Chrome 109'da kalmışsa köprü `<script src>` enjeksiyonuyla yüklenmeli.
 3. **Etiket widget'ları.** EBYS etiket alanlarını `contenteditable=false` olarak mı üretiyor? Gerçek DOM ile doğrulanmalı.
-4. **Sayı, Konu, İlgi alanlarının yeri.** EBYS bunları ayrı form alanlarında mı tutuyor, yoksa editörün içinde mi? Yönetmelik kuralları her iki durumda da güvenli çalışır: satır yoksa kural sessiz kalır. Ama form alanları ayrıysa, onların da denetlenmesi ayrı bir entegrasyon gerektirir.
+4. ~~Sayı, Konu, İlgi alanlarının yeri~~ — **karar: kapsam dışı.** Ayrı form alanları denetlenmez. Editör içinde yazılırlarsa Yönetmelik kuralları çalışır; satır yoksa sessiz kalır.

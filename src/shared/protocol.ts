@@ -32,3 +32,13 @@ export type BridgeEvent =
   | { type: 'contentDom'; editor: string }
   | { type: 'change'; editor: string }
   | { type: 'mode'; editor: string; mode: string };
+
+/**
+ * İçerik betiği → arka plan (chrome.runtime mesajı): kaynak belgeyi yeni sekmede aç.
+ * Arka plan yalnızca bu tek işi yapar; mesaj metin taşımaz, yalnızca belge adı ve sayfa.
+ */
+export const OPEN_SOURCE = 'ebys-yazim/kaynak-ac';
+export interface OpenSourceMessage {
+  type: typeof OPEN_SOURCE;
+  link: { doc: string; page: number };
+}

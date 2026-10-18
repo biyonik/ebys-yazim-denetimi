@@ -349,6 +349,21 @@ def main():
             wait_pop(page)
             ref_txt = page.locator("ebys-yazim-ui .pop .rule").inner_text()
             ok("m.16(4)" in ref_txt, f"boş satırın dayanağı: {ref_txt!r}")
+            # Dayanağa tıklayınca kaynak PDF ilgili sayfada yeni sekmede açılır
+            page.screenshot(path=str(SHOTS / "07-dayanak.png"))
+            links = page.locator("ebys-yazim-ui .pop .rule .ref-link")
+            ok(links.count() == 2, f"dayanakta 2 bağlantı (Yönetmelik + Kılavuz): {links.count()}")
+            with ctx.expect_page(timeout=5000) as new_tab:
+                links.first.click()
+            url = new_tab.value.url
+            ok(url.startswith("chrome-extension://") and url.endswith("/kaynak/yonetmelik-2646.pdf#page=6"), f"Yönetmelik m.16(4) → sayfa 6: {url}")
+            new_tab.value.close()
+            with ctx.expect_page(timeout=5000) as new_tab:
+                links.nth(1).click()
+            url = new_tab.value.url
+            ok(url.endswith("/kaynak/kilavuz-2023.pdf#page=100"), f"Kılavuz §31 → sayfa 100: {url}")
+            new_tab.value.close()
+            page.bring_to_front()
             page.keyboard.press("Escape")
             click_word(page, f7, "te ")
             wait_pop(page)
@@ -408,7 +423,22 @@ def main():
             rule_ms = [float(_re.search(r"kurallar ([0-9.]+) ms", tm).group(1)) for tm in timings if "kurallar" in tm]
             ok(len(rule_ms) == 4 and max(rule_ms[1:]) < 50, f"{words} kelimede sıcak denetim < 50 ms ({rule_ms})")
 
-            print("14) Ağ")
+            print("14) Araç çubuğu penceresi")
+            sw = ctx.service_workers[0] if ctx.service_workers else ctx.wait_for_event("serviceworker", timeout=5000)
+            ext_id = sw.url.split("/")[2]
+            pp = ctx.new_page()
+            pp.goto(f"chrome-extension://{ext_id}/popup.html")
+            body = pp.inner_text("body")
+            ok("Ahmet ALTUN" in body and "biyonik.github.io" in body, "geliştirici bilgisi görünüyor")
+            ok("Sürüm 0." in body, f"sürüm yazıyor: {pp.inner_text('#ver')!r}")
+            ok(pp.evaluate("() => document.querySelector('header img').naturalWidth") == 128, "simge yüklendi")
+            pp.screenshot(path=str(SHOTS / "06-pencere.png"))
+            pdf = ctx.new_page()
+            resp = pdf.goto(f"chrome-extension://{ext_id}/kaynak/kilavuz-2023.pdf")
+            ok(resp is None or resp.ok, "Kılavuz PDF eklenti içinde mevcut")
+            pdf.close(); pp.close()
+
+            print("15) Ağ")
             ok(external == [], f"dış ağ isteği yok ({len(external)})")
 
             errs = [c for c in console if c.startswith("error") or ("ebys-yazim" in c and not c.startswith("debug"))]

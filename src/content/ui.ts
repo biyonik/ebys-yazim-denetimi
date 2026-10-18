@@ -1,4 +1,6 @@
 import type { Category, Issue, Severity } from '../core/types.ts';
+import { KILAVUZ_TOC_PAGE, parseRef, SOURCE_TITLES, type SourceLink } from '../core/ref-links.ts';
+import { openSource } from './sources.ts';
 
 /**
  * Arayüz: öneri balonu, sayaç rozeti, sorun paneli ve bildirim.
@@ -38,7 +40,15 @@ button { font: inherit; cursor: pointer; border-radius: 6px; color: inherit; }
 .row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f3f4; padding-top: 6px; }
 .ghost { background: none; border: 0; color: #5f6368; padding: 2px 4px; }
 .ghost:hover { color: #202124; text-decoration: underline; }
-.rule { color: #80868b; font-size: 11px; text-align: right; max-width: 210px; }
+.rule { color: #80868b; font-size: 11px; text-align: right; max-width: 230px; }
+.ref-link {
+  background: none; border: 0; padding: 0; color: #1a73e8; font-size: inherit; border-radius: 2px;
+  text-decoration: underline dotted; text-underline-offset: 2px;
+}
+.ref-link:hover, .ref-link:focus-visible { color: #174ea6; text-decoration-style: solid; outline: none; }
+.ref-link:focus-visible { box-shadow: 0 0 0 2px #d2e3fc; }
+.pf { display: flex; gap: 10px; align-items: center; padding: 7px 12px; border-top: 1px solid #f1f3f4; color: #80868b; font-size: 11px; }
+.pf .ref-link { font-size: 11px; }
 
 .badge {
   position: fixed; z-index: 2147483646; font: 600 12px/1 system-ui, "Segoe UI", Arial, sans-serif;
@@ -195,8 +205,9 @@ export class EditorUi {
     const row = this.el('div', 'row');
     const ignore = this.el('button', 'ghost', 'Yoksay');
     ignore.addEventListener('click', () => h.onIgnore(issue));
-    const ref = this.el('span', 'rule', issue.ref ?? issue.ruleId);
+    const ref = this.el('span', 'rule');
     ref.title = issue.ruleId;
+    this.renderRef(ref, issue.ref ?? issue.ruleId);
     row.append(ignore, ref);
 
     pop.append(sev, msg, sugs, row);
@@ -215,6 +226,29 @@ export class EditorUi {
 
     this.pop = pop;
     this.current = issue;
+  }
+
+  /** Dayanak metni: Kılavuz/Yönetmelik atıfları tıklanabilir, gerisi düz metin (textContent) */
+  private renderRef(into: HTMLElement, ref: string): void {
+    for (const part of parseRef(ref)) {
+      if (!part.link) {
+        into.append(this.doc.createTextNode(part.text));
+        continue;
+      }
+      into.append(this.sourceButton(part.text, part.link));
+    }
+  }
+
+  private sourceButton(label: string, link: SourceLink): HTMLButtonElement {
+    const b = this.el('button', 'ref-link', label);
+    b.type = 'button';
+    b.title = `${SOURCE_TITLES[link.doc]} — sayfa ${link.page} (yeni sekmede açılır)`;
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openSource(link);
+    });
+    return b;
   }
 
   hidePopover(): void {
@@ -281,6 +315,9 @@ export class EditorUi {
       }
       panel.appendChild(list);
     }
+    const foot = this.el('div', 'pf', 'Kaynaklar:');
+    foot.append(this.sourceButton('Kılavuz', { doc: 'kilavuz', page: KILAVUZ_TOC_PAGE }), this.sourceButton('Yönetmelik', { doc: 'yonetmelik', page: 1 }));
+    panel.appendChild(foot);
 
     panel.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') h.onClose();

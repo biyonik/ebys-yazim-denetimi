@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>EBYS Yazım Denetimi</title>
+<style>
+  :root { color-scheme: light; --ink: #202124; --muted: #5f6368; --line: #e8eaed; --navy: #17325c; --red: #d62828; --blue: #1a73e8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 320px; font: 13px/1.5 system-ui, "Segoe UI", Arial, sans-serif; color: var(--ink); background: #fff; }
+  header { display: flex; gap: 12px; align-items: center; padding: 14px 16px 12px; background: var(--navy); color: #fff; }
+  header img { width: 40px; height: 40px; flex: none; }
+  h1 { font-size: 15px; font-weight: 650; margin: 0; letter-spacing: .01em; }
+  .ver { font-size: 11.5px; opacity: .75; }
+  section { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  p { margin: 0 0 8px; }
+  p:last-child { margin-bottom: 0; }
+  .muted { color: var(--muted); font-size: 12px; }
+  h2 { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
+  .src { display: block; width: 100%; text-align: left; font: inherit; background: #f8f9fa; border: 1px solid var(--line);
+         border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer; color: var(--ink); }
+  .src:hover, .src:focus-visible { border-color: #c6dafc; background: #e8f0fe; outline: none; }
+  .src b { display: block; font-weight: 600; }
+  .src span { color: var(--muted); font-size: 11.5px; }
+  .legend { display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; align-items: center; font-size: 12px; }
+  .sq { width: 18px; height: 3px; border-radius: 2px; }
+  footer { padding: 10px 16px 12px; font-size: 12px; color: var(--muted); }
+  footer b { color: var(--ink); font-weight: 600; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<header>
+  <img src="icons/icon-128.png" alt="">
+  <div><h1>EBYS Yazım Denetimi</h1><div class="ver" id="ver"></div></div>
+</header>
+<section>
+  <p>Resmî yazıları EBYS editöründe yazarken Türkçe yazım, noktalama ve resmî yazışma kurallarını denetler.</p>
+  <p class="muted">Tamamen bilgisayarınızda çalışır: hiçbir izin istemez, ağa bağlanmaz, yazdığınız metin hiçbir yere gönderilmez.</p>
+</section>
+<section>
+  <h2>İşaretler</h2>
+  <div class="legend">
+    <span class="sq" style="background:#d93025"></span><span><b>Hata</b> — kesin yanlış; “Tümünü düzelt” uygular</span>
+    <span class="sq" style="background:#e37400"></span><span><b>Kontrol edin</b> — bağlama bağlı, karar sizin</span>
+    <span class="sq" style="background:#1a73e8"></span><span><b>Öneri</b> — üslup ve biçim</span>
+  </div>
+</section>
+<section>
+  <h2>Dayanak belgeler</h2>
+  <button class="src" data-doc="kilavuz" data-page="3"><b>Resmî Yazışma Kuralları Kılavuzu</b><span>Ocak 2023 baskısı · İçindekiler</span></button>
+  <button class="src" data-doc="yonetmelik" data-page="1"><b>Resmî Yazışma Yönetmeliği</b><span>RG 10.06.2020/31151 · örnek yazılarıyla</span></button>
+  <p class="muted">Uyarı balonundaki “Kılavuz §13.6.3”, “Yönetmelik m.16(4)” gibi atıflara tıklayınca ilgili sayfa açılır.</p>
+</section>
+<footer>
+  Geliştirici: <b>Ahmet ALTUN</b><br>
+  <a href="mailto:ahmet.altun60@gmail.com">ahmet.altun60@gmail.com</a> · <a href="https://biyonik.github.io" target="_blank" rel="noopener">biyonik.github.io</a>
+</footer>
+<script src="popup.js"></script>
+</body>
+</html>

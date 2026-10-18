@@ -1,7 +1,7 @@
 // Build: node build.mjs [--dev]
 //  --dev  → localhost adreslerini de ekler (test harness için)
 import { build } from 'esbuild';
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
 const dev = process.argv.includes('--dev');
 const cfg = JSON.parse(readFileSync('ebys.config.json', 'utf8'));
@@ -12,7 +12,12 @@ rmSync('dist', { recursive: true, force: true });
 mkdirSync('dist', { recursive: true });
 
 await build({
-  entryPoints: { content: 'src/content/main.ts', bridge: 'src/bridge/main-world.ts' },
+  entryPoints: {
+    content: 'src/content/main.ts',
+    bridge: 'src/bridge/main-world.ts',
+    background: 'src/background/service-worker.ts',
+    popup: 'src/popup/popup.ts',
+  },
   outdir: 'dist',
   bundle: true,
   format: 'iife',
@@ -27,7 +32,7 @@ await build({
 // Ağ erişimi yasağı: paketlenmiş kodda hiçbir ağ API'si bulunmamalı.
 // Bu, "metin dışarı çıkmaz" iddiasının makine tarafından doğrulanan hâlidir.
 const FORBIDDEN = /\b(fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon|RTCPeerConnection|importScripts)\b/;
-for (const f of ['content.js', 'bridge.js']) {
+for (const f of ['content.js', 'bridge.js', 'background.js', 'popup.js']) {
   const src = readFileSync(`dist/${f}`, 'utf8').replace(/\/\/# sourceMappingURL=.*$/m, '');
   const m = FORBIDDEN.exec(src);
   if (m) {
@@ -36,11 +41,24 @@ for (const f of ['content.js', 'bridge.js']) {
   }
 }
 
+// Statik dosyalar: simgeler, araç çubuğu penceresi, dayanak belgeler (PDF)
+cpSync('assets/icons', 'dist/icons', { recursive: true });
+cpSync('assets/kaynak', 'dist/kaynak', { recursive: true });
+cpSync('src/popup/popup.html', 'dist/popup.html');
+
+const ICONS = { 16: 'icons/icon-16.png', 32: 'icons/icon-32.png', 48: 'icons/icon-48.png', 128: 'icons/icon-128.png' };
 const manifest = {
   manifest_version: 3,
   name: 'EBYS Yazım Denetimi',
   version: pkg.version,
-  description: 'EBYS evrak editöründe Türkçe yazım ve noktalama denetimi. Tamamen yerel çalışır; metin hiçbir yere gönderilmez.',
+  // Chrome Web Mağazası sınırı 132 karakter
+  description: 'EBYS’de resmî yazıları Türkçe yazım, noktalama ve Resmî Yazışma Kuralları’na göre denetler. Yerel çalışır, metin gönderilmez.',
+  author: { email: 'ahmet.altun60@gmail.com' },
+  homepage_url: 'https://biyonik.github.io',
+  icons: ICONS,
+  action: { default_title: 'EBYS Yazım Denetimi', default_icon: ICONS, default_popup: 'popup.html' },
+  // Kaynak PDF'i yeni sekmede açmak için (chrome.tabs.create izin gerektirmez)
+  background: { service_worker: 'background.js' },
   // world: "MAIN" Chrome 111 ile geldi; Highlight API 105
   minimum_chrome_version: '111',
   permissions: [],
@@ -49,6 +67,7 @@ const manifest = {
     { matches, js: ['content.js'], all_frames: true, run_at: 'document_idle' },
   ],
 };
+if (manifest.description.length > 132) throw new Error(`manifest açıklaması 132 karakteri aşıyor (${manifest.description.length})`);
 writeFileSync('dist/manifest.json', JSON.stringify(manifest, null, 2));
 
 // Apache-2.0: türetilmiş sözlük verisiyle birlikte lisans metni ve atıf dağıtılır

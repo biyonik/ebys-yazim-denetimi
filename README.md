@@ -12,7 +12,12 @@ metin hiçbir yere gönderilmez.
   sayılar, büyük harf, anlatım bozuklukları, şahsileştirilmiş anlatım, muhatap, tekit — § atfıyla;
   s.54 "sık yanlış kullanılan kelimeler" tablosunun tamamı
 
-Mimari kararlar ve yol haritası: [docs/MIMARI.md](docs/MIMARI.md)
+- **Tıklanabilir dayanak:** uyarıdaki "Kılavuz §13.6.3", "Yönetmelik m.16(4)" atfı, eklentinin içindeki
+  PDF'i ilgili sayfada yeni sekmede açar (ağ gerekmez)
+
+Mimari kararlar ve yol haritası: [docs/MIMARI.md](docs/MIMARI.md) · Tanıtım metni: [docs/ACIKLAMA.md](docs/ACIKLAMA.md)
+
+**Geliştirici:** Ahmet ALTUN · ahmet.altun60@gmail.com · https://biyonik.github.io
 
 ## Kurulum (geliştirme)
 
@@ -36,6 +41,19 @@ node scripts/build-lexicon.mjs
 ```
 
 Derlenen eklenti `THIRD_PARTY_LICENSES.txt` ile birlikte dağıtılır.
+
+## Dayanak belgeler ve simgeler
+
+`assets/kaynak/` altındaki iki PDF (Kılavuz, Ocak 2023; Yönetmelik, RG 31151 ekleriyle) pakete
+olduğu gibi kopyalanır. Atıf → sayfa dizini (`src/core/ref-index.ts`) depoda hazırdır; PDF'ler
+değişirse yeniden üret:
+
+```bash
+pip install pymupdf
+python scripts/build-ref-index.py
+```
+
+Simge değişirse: `python scripts/make-icons.py yeni-simge.png` (1024×1024, şeffaf arka plan).
 
 ## Testler
 
@@ -72,6 +90,9 @@ src/core/rules/kilavuz.ts      Resmî Yazışma Kuralları Kılavuzu (metin içi
 scripts/        sözlük derleyici
 vendor/zemberek Zemberek sözlükleri (Apache-2.0)
 src/content/    içerik betiği: keşif, metin indeksi, işaretleme, arayüz
+src/background/ arka plan: dayanak PDF'ini doğru sayfada yeni sekmede açar
+src/popup/      araç çubuğu penceresi: sürüm, kaynaklar, geliştirici
+assets/         simgeler ve dayanak PDF'leri
 src/bridge/     MAIN world köprüsü (CKEditor API'si)
 src/shared/     köprü protokolü
 test/unit/      çekirdek birim testleri

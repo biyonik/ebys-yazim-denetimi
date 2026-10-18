@@ -1,6 +1,6 @@
 {
   "name": "ebys-yazim",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "EBYS evrak editörü için yerel çalışan Türkçe yazım denetimi (Chrome eklentisi)",
   "scripts": {
     "build": "node build.mjs",
@@ -9,7 +9,8 @@
     "test": "node --test test/unit/*.test.ts",
     "test:e2e": "node build.mjs --dev && python3 test/e2e/run.py"
   },
-  "author": "Ahmet Altun",
+  "author": "Ahmet ALTUN <ahmet.altun60@gmail.com> (https://biyonik.github.io)",
+  "homepage": "https://biyonik.github.io",
   "license": "UNLICENSED",
   "devDependencies": {
     "@types/node": "^26.6.5",
