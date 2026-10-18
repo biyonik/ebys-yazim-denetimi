@@ -6,6 +6,7 @@ import { isUpperLetter, matchCase, trLower, trUpper, HARD_CONSONANTS } from '../
 import { ABBREVIATIONS } from './buyuk-harf.ts';
 import { longestProperPrefix } from './kesme-ozel-ad.ts';
 import { UNITS } from './kesme-sayi.ts';
+import { PROPER_NOUNS } from '../lexicon/ozel-adlar.ts';
 import { prevNonSpace } from '../tokenizer.ts';
 
 /**
@@ -79,7 +80,10 @@ export const yazimSozluk: Rule = {
       const atStart = isSentenceStart(tokens, i);
       if (isValidWord(raw, cap)) continue;
       if (cap && !atStart) continue; // cümle içi büyük harf: özel ad varsayılır
-      if (cap && (isProperName(fold(lower)) || longestProperPrefix(lower))) continue;
+      if (cap && (isProperName(fold(lower)) || PROPER_NOUNS.has(lower) || longestProperPrefix(lower))) continue;
+      // "Zeynep KARACA": resmî yazıda soyadı tamamen büyük yazılır; önündeki büyük harfli kelime addır
+      const nx = tokens[i + 1]?.text === ' ' ? tokens[i + 2] : undefined;
+      if (cap && nx?.kind === 'word' && nx.text.length >= 2 && isAllCaps(nx.text)) continue;
 
       // ── 1. Bağlaç ayırma ──
       const reps = repairs(lower);

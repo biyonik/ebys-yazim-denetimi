@@ -27,6 +27,7 @@ interface Entry {
 }
 
 const KIL = 'Kılavuz s.54, sık yanlış kullanılan kelimeler';
+const KIL_AYRI = 'Kılavuz §13.6.1, ayrı yazılan birleşik kelimeler';
 
 const ENTRIES: Entry[] = [
   { wrong: 'yanlız', right: ['yalnız'] },
@@ -78,11 +79,11 @@ const ENTRIES: Entry[] = [
   {
     wrong: 'ünvan',
     right: ['unvan'],
-    note: 'Doğru yazımı: “unvan” (TDK). Not: Kılavuz bu kelimede TDK’den ayrılıyor; Yönetmelik m.16(8) TDK’yi esas alır.',
+    ref: KIL,
+    note: 'Doğru yazımı: “unvan” (TDK; Kılavuz Ocak 2023 tablosu da “Ünvan → Unvan” der). Not: Kılavuzun Şubat 2025 baskısı bu satırı tersine çevirmiştir; Yönetmelik m.16(8) TDK’yi esas aldığı için “unvan” korunur.',
   },
-  // ── Kılavuz tablosu (Cumhurbaşkanlığı, Şubat 2025) ──
-  // Bilinçli olarak alınmayanlar: "Unvan→Ünvan" (TDK'ye aykırı; Yönetmelik m.16(8) TDK'yi
-  // esas alır), "Direk→Direkt" (direk: sütun anlamıyla doğru kelime).
+  // ── Kılavuz tablosu (Ocak 2023 baskısı, s.54; Şubat 2025 baskısıyla aynı, tek fark "unvan") ──
+  // "Direk → Direkt" aşağıda UYARI olarak: "direk" sütun anlamıyla doğru bir kelimedir.
   ...[
     ['acenta', 'acente'], ['ardarda', 'art arda'], ['askari', 'asgari'], ['asvalt', 'asfalt'],
     ['ahçı', 'aşçı'], ['aşcı', 'aşçı'], ['ayrıyeten', 'ayrıca'], ['ayrıyetten', 'ayrıca'],
@@ -111,6 +112,22 @@ const ENTRIES: Entry[] = [
   { wrong: 'mevzuatlar', right: ['mevzuat'], severity: 'uyari', note: '"Mevzuat" zaten çokluk bildirir; çokluk eki gereksizdir.', ref: KIL },
   { wrong: 'personeller', right: ['personel'], severity: 'uyari', note: '"Personel" topluluk adıdır; çokluk eki gereksizdir.', ref: KIL },
   { wrong: 'yükseköğrenim', right: ['yükseköğretim'], severity: 'uyari', note: 'Kurum ve mevzuat adlarında "Yükseköğretim" kullanılır.', ref: KIL },
+  { wrong: 'direk', right: ['direkt'], severity: 'uyari', note: '“Doğrudan” anlamında “direkt” yazılır (ya da “doğrudan” tercih edilir). “Sütun” anlamındaysa “direk” doğrudur.', ref: KIL },
+  // "yeralmak" çekimleri: gövde eşleme "yeraltı"nı da yakalayacağı için tek tek
+  ...['yeralan', 'yeralanlar', 'yeralır', 'yeralmaktadır', 'yeralmıştır', 'yeralacaktır', 'yeraldı', 'yeraldığı', 'yeralması', 'yeralmasına', 'yeralmayan', 'yeralacak'].map(
+    (w): Entry => ({ wrong: w, right: ['yer ' + w.slice(3)], ref: KIL }),
+  ),
+  // ── §13.6.1 Ayrı yazılan birleşik kelimeler (dış, iç, sıra; alt, üst, ön, art, arka, yan, karşı …) ──
+  ...[
+    ['olağandışı', 'olağan dışı'], ['kanundışı', 'kanun dışı'], ['çağdışı', 'çağ dışı'], ['ahlakdışı', 'ahlak dışı'],
+    ['haftaiçi', 'hafta içi'], ['yanısıra', 'yanı sıra'], ['ardısıra', 'ardı sıra'], ['peşisıra', 'peşi sıra'],
+    ['önyargı', 'ön yargı'], ['artniyet', 'art niyet'], ['arkaplan', 'arka plan'], ['yanetki', 'yan etki'],
+    ['karşıgörüş', 'karşı görüş'], ['karşıoy', 'karşı oy'], ['dışborç', 'dış borç'], ['dışhat', 'dış hat'],
+    ['ortanokta', 'orta nokta'], ['altkurul', 'alt kurul'], ['üstkurul', 'üst kurul'], ['önsöz', 'ön söz'],
+    ['peşinhüküm', 'peşin hüküm'], ['büyükdefter', 'büyük defter'], ['küçükharf', 'küçük harf'],
+  ].map(([wrong, right]): Entry => ({ wrong: wrong!, right: [right!], ref: KIL_AYRI })),
+  { wrong: 'içtüzük', right: ['iç tüzük'], severity: 'uyari', note: 'Genel anlamda ayrı yazılır: “iç tüzük”. Mevzuattaki özel adlarda (TBMM İçtüzüğü) tescilli yazım korunur.', ref: KIL_AYRI },
+  { wrong: 'anadili', right: ['ana dili'], severity: 'uyari', note: 'TDK ve Kılavuz: “ana dili” ayrı yazılır. Mevzuattan alıntıysa olduğu gibi bırakılabilir.', ref: KIL_AYRI },
   // Bağlama bağlı: iki anlamlı kelimeler — kesin hata değil
   {
     wrong: 'hala',

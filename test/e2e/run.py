@@ -8,7 +8,8 @@ Doğrulananlar:
   4. Geri al / yinele CKEditor'ün kendi undo'suyla çalışıyor
   5. Biçimlendirmesi bölünmüş kelimede kalınlık korunuyor
   6. setData ve kaynak modu sonrası yeniden bağlanma
-  7. Hiçbir dış ağ isteği yok
+  7. Kılavuz kuralları ve boş paragraf algısı
+  8. 5 sayfalık belgede süre, hiçbir dış ağ isteği yok
 
 Çalıştırma: npm run test:e2e
 """
@@ -272,6 +273,8 @@ def main():
             page.locator("ebys-yazim-ui .badge").click()
             fx = page.locator("ebys-yazim-ui .panel .fixall")
             ok(fx.inner_text() == "Tümünü düzelt (13)", f"buton: {fx.inner_text()!r}")
+            # 13 kesin + 2 uyarı ("bende", "ve ve"). "katılacak.Bilgilerinize" boşluk düzelince cümle sonu
+            # görünür hâle gelir ve Kılavuz'un "-DIr" önerisi ancak toplu düzeltmeden SONRA çıkar.
             ok(page.locator("ebys-yazim-ui .panel .item").count() == 15, "panelde 15 sorun listelendi")
             page.screenshot(path=str(SHOTS / "04-panel.png"))
             fx.click()
@@ -282,7 +285,7 @@ def main():
             ok("<strong>yazının</strong>" in data, "kalın parça korundu")
             f4 = [fr for fr in page.frames if fr != page.main_frame][0]
             h = highlights(f4)
-            ok(h["hata"] == [] and sorted(h["uyari"]) == ["bende", "ve ve"], f"yalnızca uyarılar kaldı: {h}")
+            ok(h["hata"] == [] and sorted(h["uyari"]) == ["bende", "ve ve"] and h["oneri"] == ["katılacak"], f"yalnızca uyarılar ve elle uygulanacak öneri kaldı: {h}")
             toast = page.locator("ebys-yazim-ui .toast")
             ok(toast.is_visible() and "13 düzeltme uygulandı" in toast.inner_text(), f"bildirim: {toast.inner_text()!r}")
             ta = page.evaluate(f"() => {{ const t = document.createElement('textarea'); t.innerHTML = document.getElementById('{ED}').value; return t.value; }}")
@@ -326,7 +329,55 @@ def main():
             ok("m.16(7)" in ref_txt, f"yönetmelik maddesi gösterildi: {ref_txt!r}")
             page.keyboard.press("Escape")
 
-            print("12) Performans: 5 sayfalık belge")
+            print("12) Kılavuz kuralları ve boş paragraf (tarayıcıda)")
+            p1 = "Başkanlığımız tarafından yürütülen çalışmalar kapsamında gerekli inceleme yapılmıştır."
+            p2 = "Malzeme de hizmet te ihaleyle alınacak olup oran % 25 olarak belirlenmiştir."
+            html = f"<p>{p1}</p><p>&nbsp;</p><p>{p2}</p><p>Bilgilerinize arz ederim.</p>"
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, html])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-uyari');
+                           return h && [...h].some(r => r.toString() === 'Malzeme'); }""",
+                timeout=5000,
+            )
+            f7 = [fr for fr in page.frames if fr != page.main_frame][0]
+            empty_html = f7.evaluate("() => document.body.innerHTML")
+            h = highlights(f7)
+            ok("Malzeme" in h["uyari"], f"paragraflar arası boş satır işaretlendi (editörde: {empty_html[:120]!r}…)")
+            ok("hizmet te" in h["hata"] and "% " in h["hata"], f"Kılavuz kuralları işaretlendi: {h['hata']}")
+            click_word(page, f7, "Malzeme")
+            wait_pop(page)
+            ref_txt = page.locator("ebys-yazim-ui .pop .rule").inner_text()
+            ok("m.16(4)" in ref_txt, f"boş satırın dayanağı: {ref_txt!r}")
+            page.keyboard.press("Escape")
+            click_word(page, f7, "te ")
+            wait_pop(page)
+            btn = page.locator("ebys-yazim-ui .pop .sug").first
+            ok(btn.inner_text() == "hizmet de", f"öneri: hizmet te → {btn.inner_text()!r}")
+            btn.click()
+            time.sleep(0.45)
+            ok("hizmet de ihaleyle" in get_data(page), "iki kelimelik düzeltme uygulandı")
+            # Boş paragraf silinince işaret kalkar
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, f"<p>{p1}</p><p>{p2}</p>"])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');
+                           const u = f && f.contentWindow.CSS.highlights.get('ebys-yazim-uyari');
+                           return h && [...h].length > 0 && !(u && [...u].some(r => r.toString() === 'Malzeme')); }""",
+                timeout=5000,
+            )
+            ok(True, "boş satır silinince uyarı kalktı")
+            # <p><br></p> biçimindeki boş paragraf da aynı şekilde görülür
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, f"<p>{p1}</p><p><br></p><p>{p2}</p>"])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const u = f && f.contentWindow.CSS.highlights.get('ebys-yazim-uyari');
+                           return u && [...u].some(r => r.toString() === 'Malzeme'); }""",
+                timeout=5000,
+            )
+            ok(True, "<p><br></p> boş paragrafı da algılandı")
+
+            print("13) Performans: 5 sayfalık belge")
             para = ("İlgi (a) yazınızla Bakanlığımıza iletilen talep incelenmiş olup söz konusu hususta "
                     "gerekli değerlendirmelerin yapılabilmesi için ilgili birimlerin görüşlerine başvurulmuştur. "
                     "Konuya ilişkin olarak hazırlanan raporun ekte gönderildiği, mevzuat çerçevesinde yürütülecek "
@@ -357,7 +408,7 @@ def main():
             rule_ms = [float(_re.search(r"kurallar ([0-9.]+) ms", tm).group(1)) for tm in timings if "kurallar" in tm]
             ok(len(rule_ms) == 4 and max(rule_ms[1:]) < 50, f"{words} kelimede sıcak denetim < 50 ms ({rule_ms})")
 
-            print("13) Ağ")
+            print("14) Ağ")
             ok(external == [], f"dış ağ isteği yok ({len(external)})")
 
             errs = [c for c in console if c.startswith("error") or ("ebys-yazim" in c and not c.startswith("debug"))]

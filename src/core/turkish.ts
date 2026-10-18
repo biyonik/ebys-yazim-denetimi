@@ -67,6 +67,26 @@ export function harmonyOf(vowel: string): Harmony {
   return { back: BACK.has(vowel), round: ROUND.has(vowel) };
 }
 
+/**
+ * Son ünlüsü kalın olduğu hâlde ince ünlülü ek alan kelimeler (Arapça kökenli ince "l",
+ * uzun "a"): saate, kontrolü, usulü, kabulde, hâle, Kemal'e. Yalnızca bu kelimelerin
+ * kendileri; çözümleyici aynı bilgiyi sözlükteki işaretten alır, ek uyumu (kesme
+ * işaretli ekler, bağlaç önerileri) ise bu listeden.
+ */
+const FRONT_HARMONY_WORDS = new Set([
+  'saat', 'kontrol', 'protokol', 'usul', 'kabul', 'hal', 'rol', 'ihtimal', 'alkol', 'petrol', 'sembol', 'hayal',
+  'misal', 'meal', 'kalp', 'gol', 'istiklal', 'emsal', 'sual', 'futbol', 'voleybol', 'basketbol', 'metropol',
+  'idrak', 'iştirak', 'infilak', 'hakikat', 'dikkat', 'cemaat', 'mahsul', 'meşgul', 'menkul', 'hilal', 'helal',
+  'kemal', 'cemal', 'celal', 'bilal', 'iclal', 'meal', 'ahval', 'ihmal', 'istikbal', 'ihtilal', 'iştial',
+]);
+
+/** Kelimeye gelecek ekin uyacağı ünlü: son ünlü, ince uyumlu alıntılar için ince */
+export function baseHarmony(word: string): Harmony {
+  const w = trLower(word);
+  const h = harmonyOf(lastVowel(w) ?? 'e');
+  return FRONT_HARMONY_WORDS.has(w) ? { back: false, round: h.round } : h;
+}
+
 /** Büyük ünlü uyumu: iki yönlü (a/e) */
 export function harmonize2(prev: Harmony): string {
   return prev.back ? 'a' : 'e';

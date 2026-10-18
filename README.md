@@ -6,8 +6,11 @@ metin hiçbir yere gönderilmez.
 
 - **Morfolojik yazım denetimi:** ~35 bin kök + Türkçe ek dizimi ve ses olayları; öneriler (`yapilacak` → `yapılacak`)
 - **TDK yazım kuralları:** kesme işareti, de/da–ki–mi, bitişik/ayrı yazım, büyük harf, noktalama
-- **Resmî Yazışma Yönetmeliği** (RG 10.06.2020/31151) ve 2025 Kılavuzu: Konu, Sayı, İlgi, Ek, tarih,
-  tutar, kısaltma, kapanış, süreli yazı, imza — her işaret madde atfıyla
+- **Resmî Yazışma Yönetmeliği** (RG 10.06.2020/31151): Konu, Sayı, İlgi, Ek, tarih, tutar, kısaltma,
+  kapanış, süreli yazı, imza, paragraflar arası boş satır — her işaret madde atfıyla
+- **Resmî Yazışma Kuralları Kılavuzu** (Ocak 2023 baskısı): de/da ve kesme, virgül, kısaltma ekleri,
+  sayılar, büyük harf, anlatım bozuklukları, şahsileştirilmiş anlatım, muhatap, tekit — § atfıyla;
+  s.54 "sık yanlış kullanılan kelimeler" tablosunun tamamı
 
 Mimari kararlar ve yol haritası: [docs/MIMARI.md](docs/MIMARI.md)
 
@@ -37,7 +40,7 @@ Derlenen eklenti `THIRD_PARTY_LICENSES.txt` ile birlikte dağıtılır.
 ## Testler
 
 ```bash
-npm test               # çekirdek kurallar, çözümleyici, yönetmelik (node:test)
+npm test               # çekirdek kurallar, çözümleyici, yönetmelik, Kılavuz (node:test)
 npm run typecheck
 npm run test:e2e       # eklenti yüklü Chromium + gerçek CKEditor 4 (Playwright, Python)
 ```
@@ -65,6 +68,7 @@ isteği olmaması. Geliştirme derlemesinde her denetimin süresi DevTools konso
 src/core/       DOM bilmeyen denetim çekirdeği (tokenizer, kurallar, motor)
 src/core/morph/ biçimbilimsel çözümleyici ve öneri üretimi
 src/core/rules/yonetmelik.ts   Resmî Yazışma Yönetmeliği kuralları
+src/core/rules/kilavuz.ts      Resmî Yazışma Kuralları Kılavuzu (metin içi kurallar)
 scripts/        sözlük derleyici
 vendor/zemberek Zemberek sözlükleri (Apache-2.0)
 src/content/    içerik betiği: keşif, metin indeksi, işaretleme, arayüz

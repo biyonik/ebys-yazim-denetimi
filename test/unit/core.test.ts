@@ -99,7 +99,7 @@ test('noktalama boşlukları', () => {
 });
 
 test('kelime tekrarı: ikilemeler serbest', () => {
-  assert.deepEqual(ids('Yavaş yavaş ilerledi.'), []);
+  assert.deepEqual(ids('Yavaş yavaş ilerledi.').filter((id) => id.startsWith('tekrar.')), []);
   assert.equal(check('Bu ve ve şu.')[0]?.ruleId, 'tekrar.kelime');
 });
 

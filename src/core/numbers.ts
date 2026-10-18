@@ -50,3 +50,50 @@ export function spokenLastWord(numberBody: string): string {
   // Tarih (16.10.2026), ondalık (2,5), saat (10:30): son grup okunur
   return lastWordOfInteger(last);
 }
+
+/**
+ * Tam sayının yazıyla okunuşu (TDK: kelimeler ayrı yazılır): 1250 → "bin iki yüz elli".
+ * Üleştirme sayıları ve "ikiyüz" gibi bitişik yazımların düzeltmesi için kullanılır.
+ * 1 milyardan büyük sayılar için null (resmî yazıda üleştirme olarak geçmez).
+ */
+export function integerToWords(n: number): string | null {
+  if (!Number.isInteger(n) || n < 0 || n >= 1_000_000_000) return null;
+  if (n === 0) return 'sıfır';
+  const below1000 = (x: number): string[] => {
+    const out: string[] = [];
+    const h = Math.floor(x / 100);
+    const t = Math.floor((x % 100) / 10);
+    const u = x % 10;
+    if (h) out.push(...(h === 1 ? ['yüz'] : [UNITS[h]!, 'yüz']));
+    if (t) out.push(TENS[t]!);
+    if (u) out.push(UNITS[u]!);
+    return out;
+  };
+  const words: string[] = [];
+  const millions = Math.floor(n / 1_000_000);
+  const thousands = Math.floor((n % 1_000_000) / 1000);
+  const rest = n % 1000;
+  if (millions) words.push(...below1000(millions), 'milyon');
+  // "bin", "bir bin" değil
+  if (thousands) words.push(...(thousands === 1 ? [] : below1000(thousands)), 'bin');
+  words.push(...below1000(rest));
+  return words.join(' ');
+}
+
+/**
+ * Üleştirme sayısı: 2 → "ikişer", 9 → "dokuzar", 4 → "dörder", 100 → "yüzer".
+ * Ünlüyle biten sayıya -şAr, ünsüzle bitene -Ar gelir; "dört" yumuşar.
+ */
+export function distributiveWords(n: number): string | null {
+  if (n < 1 || n >= 1_000_000) return null;
+  const words = integerToWords(n);
+  if (!words) return null;
+  const parts = words.split(' ');
+  let last = parts.pop()!;
+  const vowels = last.match(/[aeıioöuü]/g)!;
+  const back = 'aıou'.includes(vowels[vowels.length - 1]!);
+  const a = back ? 'a' : 'e';
+  if (/[aeıioöuü]$/.test(last)) last += 'ş' + a + 'r';
+  else last = (last === 'dört' ? 'dörd' : last) + a + 'r';
+  return [...parts, last].join(' ');
+}

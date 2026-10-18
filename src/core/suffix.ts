@@ -1,4 +1,5 @@
 import {
+  baseHarmony,
   HARD_CONSONANTS,
   harmonize2,
   harmonize4,
@@ -41,7 +42,7 @@ export function harmonizeSuffix(base: string, suffix: string): string {
   const b = trLower(base);
   const lv = lastVowel(b);
   if (!lv) return trLower(suffix); // ünlüsüz gövde (kısaltma vb.): dokunma
-  let prev = harmonyOf(lv);
+  let prev = baseHarmony(b);
   let lastChar = b[b.length - 1]!;
   const endsWithVowel = isVowel(lastChar);
   let out = '';

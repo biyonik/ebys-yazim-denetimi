@@ -10,9 +10,16 @@ import { baglacKurallari, miUyum } from './rules/baglac.ts';
 import { buyukHarf } from './rules/buyuk-harf.ts';
 import { yazimSozluk } from './rules/yazim-sozluk.ts';
 import { YONETMELIK_RULES } from './rules/yonetmelik.ts';
+import { KILAVUZ_RULES } from './rules/kilavuz.ts';
 import { capitalizeTr, isLowerLetter } from './turkish.ts';
 
+/**
+ * Sıra, çakışma çözümünde eşitlik bozucudur: aynı aralık ve aynı önem derecesinde
+ * önce gelen kural kazanır. Kılavuz kuralları en özgül olanlardır ("2şer" için
+ * "2'şer" değil "ikişer"), bu yüzden başta.
+ */
 export const DEFAULT_RULES: Rule[] = [
+  ...KILAVUZ_RULES,
   yayginYanlislar,
   birlesikFiil,
   birlesikFiilBitisik,

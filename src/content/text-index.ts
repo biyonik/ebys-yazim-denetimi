@@ -125,9 +125,16 @@ export class TextIndex {
       const isCell = CELL.has(tag);
       if (isBlock) pushSep(SEP_BLOCK);
       if (isCell) pushSep(SEP_CELL);
+      const contentStart = out.length;
       for (let c = el.firstChild; c; c = c.nextSibling) visit(c);
       if (isBlock) pushSep(SEP_BLOCK, tag === 'TABLE');
       if (isCell) pushSep(SEP_CELL);
+      // Boş paragraf (<p><br></p>, <p>&nbsp;</p>) görünür bir boş satırdır: "\n\n" olarak
+      // korunur ki "paragraflar arasında satır boşluğu bırakılmaz" (m.16(4)) denetlenebilsin.
+      // Art arda birden çok boş paragraf tek boş satıra iner.
+      if (tag === 'P' && out.length > 1 && !/[^\s]/.test(out.slice(contentStart)) && out.endsWith(SEP_BLOCK) && out[out.length - 2] !== SEP_BLOCK) {
+        out += SEP_BLOCK;
+      }
     };
 
     visit(root);

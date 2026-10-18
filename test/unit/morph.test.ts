@@ -72,9 +72,9 @@ test('yazım kuralı: uçtan uca', () => {
 });
 
 test('yazım kuralı: yanlış pozitif kalkanı', () => {
-  // Yalnızca yazım kuralları (yönetmeliğin kısaltma tanımı önerisi ayrıca test edilir)
+  // Yalnızca yazım kuralları (yönetmeliğin kısaltma tanımı ve Kılavuz'un cümle sonu önerisi ayrıca test edilir)
   const none = (t: string) =>
-    assert.deepEqual(check(t).filter((i) => !i.ruleId.startsWith('yonetmelik.')).map((i) => `${i.ruleId}:${i.text}`), [], t);
+    assert.deepEqual(check(t).filter((i) => !i.ruleId.startsWith('yonetmelik.') && i.ruleId !== 'kilavuz.sahsi').map((i) => `${i.ruleId}:${i.text}`), [], t);
   none('Toplantıya Kocatepe Mahallesinden katılım oldu.'); // cümle içi büyük harf: özel ad
   none('Konu TBMM ve DETSİS kayıtlarıyla ilgilidir.'); // kısaltmalar
   none('Kitap, defter vb. malzemeler alınacaktır.'); // noktalı kısaltma

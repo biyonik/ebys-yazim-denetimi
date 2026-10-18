@@ -13,11 +13,13 @@ test('uzun cümle: kesinler düzelir, bağlama bağlılar kalır', () => {
     "Orijinal evrakların Ahmet'in masasında olduğunu bende biliyorum ama Balıkesir Valiliğine gönderilecek yazının saat 3'te hazır olması gerekiyor mu bilmiyorum, yalnız Mehmet'ten gelen bilgiye göre toplantı 2026'da Ankara'da yapılacak ve ve herkes katılacak. Bilgilerinize arz ederim.",
   );
   assert.equal(r.applied, 13);
+  // Kalanlar: bağlama bağlı uyarılar + Kılavuz'un cümle sonu önerisi (üslup kararı, elle uygulanır)
   assert.deepEqual(
     r.remaining.map((i) => i.text),
-    ['bende', 've ve'],
+    ['bende', 've ve', 'katılacak'],
   );
-  assert.ok(r.remaining.every((i) => i.severity === 'uyari'));
+  assert.ok(r.remaining.every((i) => !isAutoFixable(i)));
+  assert.deepEqual(r.remaining.at(-1)?.suggestions, ['katılacaktır']);
 });
 
 test('uyarı ve çok seçenekli öneri asla otomatik uygulanmaz', () => {

@@ -6,7 +6,8 @@ import { capitalizeTr, isLowerLetter, trLower, trUpper } from '../turkish.ts';
 /**
  * Resmî Yazışmalarda Uygulanacak Usul ve Esaslar Hakkında Yönetmelik
  * (CB Kararı 2646, RG 10.06.2020/31151; 2026 itibarıyla değişiklik yok)
- * ve Cumhurbaşkanlığı Genel Sekreterliği Kılavuzu (Şubat 2025).
+ * ve Resmî Yazışma Kuralları Kılavuzu (Ocak 2023 kurum baskısı; Şubat 2025 ile karşılaştırıldı,
+ * farklar docs/MIMARI.md). Kılavuzun metin içi kuralları ayrı modülde: kilavuz.ts.
  *
  * Önem derecesi hükmün bağlayıcılığından gelir:
  *   Yönetmelikte "-ır/-ir" (kesin hüküm)  → hata
@@ -22,13 +23,13 @@ const Y = (m: string) => `Yönetmelik m.${m}`;
 const K = (s: string) => `Kılavuz §${s}`;
 const TR_ALPHABET = 'abcçdefgğhıijklmnoöprsştuüvyz';
 
-interface Line {
+export interface Line {
   start: number;
   end: number;
   text: string;
 }
 
-function linesOf(text: string): Line[] {
+export function linesOf(text: string): Line[] {
   const out: Line[] = [];
   let s = 0;
   for (let i = 0; i <= text.length; i++) {

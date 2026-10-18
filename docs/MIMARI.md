@@ -118,13 +118,15 @@ Doğru kabul edilen metinlerde yanlış pozitif ölçümü:
 | Yönetmeliğin derlenmiş metni | 5.729 | PDF kalıntıları dışında 2 sözlük uyarısı (`Kriptografik`, bir teknik terim) |
 | Yönetmeliğin 24 örnek yazısı | 3.280 | Gövde metinlerinde gerçek yanlış pozitif yok; kalanlar PDF/üstveri kalıntısı |
 | Kılavuz (2025) | 14.459 | Kılavuz'un kendi yazım hatalarını buldu: `ünvan`, `metodların`, `Andlaşmalar`, künyede "Destek **ve ve** Mali" |
+| Kılavuz (Ocak 2023, kurum baskısı) | 14.466 | Kılavuz kurallarının işaretlerinin tamamı Kılavuz'un kendi "Yanlış kullanım" sütunlarında ya da sözü anan cümlelerde ("ve, veya, yahut bağlaçlarından…") |
+| Bağımsız inceleme: elle yazılmış ~220 doğru resmî yazı cümlesi | — | 23 yanlış alarm bulundu, hepsi düzeltildi ve `kilavuz.test.ts` içinde gerileme testi olarak duruyor |
 
 Tarayıcıda, eklenti içinde ölçülen süreler (`npm run test:e2e`, 1.600 kelime ≈ 5 sayfa):
 
 | Ölçüm | Süre |
 |---|---|
 | Metin indeksi | ~5,5 ms |
-| Tüm kurallar (sıcak) | 6,5–12,7 ms |
+| Tüm kurallar (sıcak) | 10–19 ms (Kılavuz kurallarıyla; öncesi 6,5–12,7 ms) |
 | İşaretleme | < 0,5 ms |
 | Sözlük yükleme (bir kez, sayfa boştayken) | ~80 ms |
 
@@ -146,7 +148,7 @@ Bütçe 50 ms'ydi. Paket boyutu: `content.js` 558 KB (sözlük dahil).
 |---|---|---|---|
 | `yazim.sozluk` | Sözlükte kurulamayan kelime + öneri | hata / uyarı | Cümle içi büyük harf (özel ad), tamamı büyük (kısaltma), noktalı kısaltma, URL/e-posta, `6 ncı`, tırnaktan sonraki ek, birim |
 | `baglac.*.morf` | `kitabıda`, `geldide`, `gelecekmi` | hata | Bütün kelime geçerliyse hiç bakılmaz (`kapıda`, `maddede`) |
-| `yazim.yaygin` | Sık yanlışlar + **Kılavuz s.54 tablosu** | hata / uyarı | `Unvan→Ünvan` alınmadı (TDK'ye aykırı); `bir takım`, `bu gün`, `göz altı` yalnızca uyarı |
+| `yazim.yaygin` | Sık yanlışlar + **Kılavuz s.54 tablosunun tamamı** (birim testi her satırı doğrular) + §13.6.1 ayrı yazılanlar (`önyargı`, `yanısıra`, `olağandışı`) | hata / uyarı | `bir takım`, `bu gün`, `göz altı`, `direk`, `içtüzük`, `anadili` yalnızca uyarı |
 | `yazim.birlesik-fiil` | `arzederim` → `arz ederim` | hata | Ses olaylılar |
 | `yazim.birlesik-fiil-bitisik` | `kayıt edildi` → `kaydedildi`, `red etmek` → `reddetmek` | hata | — |
 | `kesme.sayi` | `2026da`, `3'de` → `3'te`, `11.00'da` → `11.00'de` | hata | `2B`, `210x297`; saatte sıfır grubu okunmaz |
@@ -183,7 +185,46 @@ Bütçe 50 ms'ydi. Paket boyutu: `content.js` 558 KB (sözlük dahil).
 
 **Kapsam dışı**, çünkü EBYS'nin kendi sorumluluğunda: yazı tipi ve boyutu, kenar boşlukları, üstveri, sayfa numarası, satır aralıkları.
 
-**Henüz yapılmadı**, çünkü DOM düzeyinde denetim gerekiyor: paragraflar arasında boş satır (m.16(4)), 1,25 cm girinti ve iki yana yaslama.
+**Henüz yapılmadı**, çünkü biçim (CSS) düzeyinde denetim gerekiyor: 1,25 cm girinti ve iki yana yaslama. Paragraflar arasındaki boş satır (m.16(4)) artık denetleniyor: TextIndex boş `<p>`'yi (`<p><br></p>`, `<p>&nbsp;</p>`) `"\n\n"` olarak korur.
+
+### Resmî Yazışma Kuralları Kılavuzu (`kilavuz.ts`)
+
+**Kaynak sürümü.** Kurumda dağıtılan baskı **Ocak 2023**'tür (PDF sayfası = kitap sayfası + 4). Şubat 2025 baskısıyla karşılaştırıldı; kural metinleri aynı, üç fark var:
+
+| Konu | Ocak 2023 | Şubat 2025 | Eklentinin tutumu |
+|---|---|---|---|
+| s.54 tablosu | "Ünvan → **Unvan**" (TDK ile uyumlu) | "Unvan → Ünvan" (tersine çevrilmiş) | **unvan** (2023 + TDK + Yönetmelik m.16(8)) |
+| §30 tekit yazısı | yalnızca **alt** idarelere | "alt **veya aynı düzey**" | 2023'e göre öneri; ileti 2025 farkını söyler |
+| Künye | İdari İşler Başkanlığı | İdari İşler Genel Sekreterliği | etkisiz |
+
+**Önem derecesi.** Kılavuz "kullanılmaz / yanlıştır" diyor ve tespit kesinse → hata; kural kesin ama metinden okuma bağlama bağlıysa → uyarı; üslup → öneri. Cümle sonu (§13) ve büyük harfle ad (§13.5.1) önerileri tek önerili olsa bile **toplu düzeltmeye girmez**: üslup kararıdır.
+
+| Kural | § | Ne denetler | Önem |
+|---|---|---|---|
+| `kilavuz.kesme.baglac` | 13.6.3 | `Başkanlığımız'da` → "Başkanlığımız da" / "Başkanlığımızda" (iyelikli kurum adı + kesme + de) | hata, 2 öneri |
+| `kilavuz.baglac.te` | 13.6.3 | `hizmet te` → "hizmet de"; yalnızca sert ünsüzden sonra (pekiştirme "ta" ayrımı) | hata |
+| `kilavuz.kesme.cins` / `.mevzuat` | 13.6.9.8 | Cins isme kesme (`masa'nın`); küçük harfli mevzuat (`kanun'un` → "Kanun'un" / "kanunun"); büyük harfli belli mevzuatta eksik kesme (`Yönetmeliğin` → "Yönetmelik'in") | hata / uyarı |
+| `kilavuz.kesme.ay`, `buyuk-harf.ay` | 13.6.4, 13.6.9.8 | `17 Aralıkta` → "Aralık'ta", `29 ekim` → "Ekim"; ocak/ekim/aralık yalnızca tarih bağlamında | hata |
+| `kilavuz.tirnak.kesme` | 13.6.9.6 | `“…Kanunu”'na` → `“…Kanunu”na` | hata |
+| `kilavuz.virgul.*` | 13.6.9.2 | `, ve` / `ve,`; `de,`; tekrarlı bağlaç (hem … , hem de); şart ekinden sonra; tek "olup," | hata / öneri |
+| `kilavuz.anlatim.ve` | 13.5.3.1 | Cümlede 3. "ve" (ad içindekiler, "tarihli ve", "kurum ve kuruluş" sayılmaz) | öneri |
+| `kilavuz.anlatim.zincirleme` | 13.5.3.1 | "Başkanlığının Genel Müdürlüğünün …" — yalnızca üst idare → alt birim zinciri | öneri |
+| `kilavuz.anlatim.gereksiz` | 13.5.3.2 | geri iade, hâlen yürürlükte, karşılıklı yazışma, yaklaşık N adet | öneri |
+| `kilavuz.sahsi` | 13 | Cümle sonu şahsi (planladık, yapacağız, yapmalısınız) ya da -DIr'siz (yapılacak → yapılacaktır, gönderildi → gönderilmiştir); kapanış, alıntı ve madde imli satır hariç | öneri, elle |
+| `kilavuz.bitisik` | 13.6.2 | baş savcı, yayın evi, deprem zede, beyan name; kurum adlarında İç İşleri, Genel Kurmay, Açık Öğretim Fakültesi | hata / uyarı |
+| `kilavuz.buyuk-harf.*` | 13.6.4, 13.5.1 | Para birimi (yalnızca tutar ya da "Türk/ABD" ile), "Konya İli", "Göksu mahallesi", "… daire başkanlığı", "Sıfır Atık projesinde" | hata / uyarı / öneri |
+| `kilavuz.kisaltma.*` | 13.6.5 | `TDK'dan` → "TDK'den" (harf okunuşu ya da kelime okunuşu: NATO'dan); `kg'den` → "kg'dan"; `T.B.M.M.`; `vb.'leri` | hata |
+| `kilavuz.sayi.*` | 13.6.7 | `% 25`, `25%`; `2'şer` → "ikişer" (para tutarı hariç); `ikiyüz` → "iki yüz" (ayraç içindeki ticari tutar hariç) | hata |
+| `kilavuz.nispet` | 13.6.8 | resmi/askeri/dini/ilmi/milli + ad → î; "Resmî Gazete"; iyelik okuması ("Atatürk'ün resmi", "Türk askeri") atlanır | öneri, elle |
+| `kilavuz.ilgi.*`, `kilavuz.ek.gosterim`, `kilavuz.kapanis.bilgi` | 12.1, 13.1–13.3 | "tarihli E-…" → "tarihli ve"; "İlgi (a)'da", "İlgi'de kayıtlı", "Ek'te yer alan", "Ek-2"; "Bilgilerinize rica" | hata / öneri |
+| `kilavuz.muhatap.*` | 11.4 | Muhatap üstünde T.C.; yönelme eki parantezdeki birimde; parantezde birim zinciri; gerçek kişiye yönelme eki | hata / uyarı |
+| `kilavuz.ek.sayi` | 15 | Ek maddesinde sayısal bilgi yok ("(2 Sayfa)", "(1 Adet)") | öneri |
+| `kilavuz.sureli.*` | 23 | GÜNLÜDÜR'de süre yok; ACELE'de cevap süresi var; Olur belgesinde ibare | uyarı |
+| `kilavuz.tekit.*` | 30 | Tekitte ilgi yok; "arz ederim" ile biten tekit | uyarı / öneri |
+| `kilavuz.imza.ad` | 14.2, 11.3 | "Mehmet A. YILMAZ" | uyarı |
+| `kilavuz.paragraf.bosluk` | m.16(4), 31 | İki metin paragrafı arasında boş satır (başlık, muhatap, imza, e-imza notu çevresi hariç) | uyarı |
+
+**Bilinçli olarak alınmayanlar:** cümle ögesi eksikliği ve tamlama kusuru (§13.5.3.4), sıralama/anlam hataları (§13.5.3.3). Bunlar sözdizimsel çözümleme ister; kural tabanlı tahmin yanlış alarmla güveni bozar.
 
 ### Kesinlik sınırı
 
@@ -201,6 +242,7 @@ Bu fazlar bir "MVP sonra genişlet" planı değil; tek bir bütün ürünün in�
 - **Faz 2 — Morfoloji motoru** ✅
 - **Faz 3 — Morfolojiye dayalı kurallar** ✅ (bağlaç ayırma, özel ad, bitişik/ayrı yazım)
 - **Faz 4 — Resmî Yazışma Yönetmeliği** ✅
+- **Faz 4b — Resmî Yazışma Kuralları Kılavuzu (Ocak 2023)** ✅ metin içi imla, noktalama, anlatım, muhatap, ek, süreli yazı, tekit
 - **Faz 5 — Kullanıcı sözlüğü ve ayarlar:**
   - kalıcı yoksay ve "sözlüğe ekle" (`chrome.storage.local`),
   - kurum geneli sözlük ve politika (`chrome.storage.managed`),
@@ -212,7 +254,7 @@ Bu fazlar bir "MVP sonra genişlet" planı değil; tek bir bütün ürünün in�
 - **Aday özellikler:**
   - imzalamadan önce son kontrol,
   - rakam ve yazı tutarlılığı ("1.250,00 TL (Bin iki yüz elli Türk lirası)"),
-  - DOM düzeyi biçim denetimleri (m.16(4)).
+  - CSS düzeyi biçim denetimleri (1,25 cm girinti, iki yana yaslama).
 
 ## 9. Açık sorular
 
