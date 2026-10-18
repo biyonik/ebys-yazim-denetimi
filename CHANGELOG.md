@@ -1,5 +1,13 @@
 # Sürüm notları
 
+## v0.4.1 — 18.10.2026
+
+- **Deneme sayfası:** https://biyonik.github.io/ebys-yazim-denetimi/demo/ — EBYS’ye girmeden denemek ve mağaza
+  incelemesi için. Eklenti bu adreste de çalışır (`ebys.config.json` → `demoOrigins`).
+- Gizlilik politikası sayfası ve proje sayfası (GitHub Pages, `docs/`)
+- Araç çubuğu penceresine deneme sayfası bağlantısı
+- Chrome Web Mağazası görselleri ve yayın bilgileri (`docs/MAGAZA.md`)
+
 ## v0.4.0 — 18.10.2026
 
 İlk herkese açık sürüm. Hazır paket MEB EBYS (`https://ebys.meb.gov.tr`) için derlenmiştir.

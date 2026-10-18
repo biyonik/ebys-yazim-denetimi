@@ -8,6 +8,8 @@
 
 Tamamen yerel çalışır · Hiçbir izin istemez · Metin hiçbir yere gönderilmez
 
+**[Deneme sayfası](https://biyonik.github.io/ebys-yazim-denetimi/demo/)** · [Kurulum](#kurulum) · [Gizlilik](https://biyonik.github.io/ebys-yazim-denetimi/gizlilik.html)
+
 [![CI](https://github.com/biyonik/ebys-yazim-denetimi/actions/workflows/ci.yml/badge.svg)](https://github.com/biyonik/ebys-yazim-denetimi/actions/workflows/ci.yml)
 [![Lisans: Apache-2.0](https://img.shields.io/badge/lisans-Apache--2.0-blue.svg)](LICENSE)
 ![Chrome 111+](https://img.shields.io/badge/Chrome-111%2B-4285F4?logo=googlechrome&logoColor=white)

@@ -1,4 +1,12 @@
 {
-  "origins": ["https://ebys.meb.gov.tr/*"],
-  "devOrigins": ["http://localhost/*", "http://127.0.0.1/*"]
+  "origins": [
+    "https://ebys.meb.gov.tr/*"
+  ],
+  "demoOrigins": [
+    "https://biyonik.github.io/ebys-yazim-denetimi/*"
+  ],
+  "devOrigins": [
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ]
 }

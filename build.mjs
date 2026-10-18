@@ -6,7 +6,8 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 const dev = process.argv.includes('--dev');
 const cfg = JSON.parse(readFileSync('ebys.config.json', 'utf8'));
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
-const matches = [...cfg.origins, ...(dev ? cfg.devOrigins : [])];
+// demoOrigins: GitHub Pages'teki deneme sayfası (mağaza incelemesi ve EBYS'ye girmeden deneme için)
+const matches = [...cfg.origins, ...(cfg.demoOrigins ?? []), ...(dev ? cfg.devOrigins : [])];
 
 rmSync('dist', { recursive: true, force: true });
 mkdirSync('dist', { recursive: true });
