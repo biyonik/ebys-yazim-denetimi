@@ -75,7 +75,26 @@ Kamu kurumlarında kullanılan bir eklentide en önemli soru “metnim nereye gi
 
 ## Kurulum
 
-Eklenti kurumunuzun EBYS adresinde çalışacak biçimde **derlenir**. [Node.js](https://nodejs.org) 22.18 veya üstü gerekir.
+### Hazır paket (MEB EBYS)
+
+[Sürümler](https://github.com/biyonik/ebys-yazim-denetimi/releases/latest) sayfasındaki
+`ebys-yazim-denetimi-vX.Y.Z-meb.zip` dosyası `https://ebys.meb.gov.tr` için derlenmiştir.
+
+1. Zip dosyasını indirip bir klasöre çıkarın (klasörü silmeyin; Chrome eklentiyi oradan çalıştırır).
+2. Chrome adres çubuğuna `chrome://extensions` yazın, sağ üstten **Geliştirici modu**nu açın.
+3. **Paketlenmemiş öğe yükle**’ye basın ve çıkardığınız `ebys-yazim-denetimi-…-meb` klasörünü seçin.
+4. EBYS’de bir evrak açın: editörün sağ altında “✓ Yazım denetimi” rozeti görünür.
+
+Güncellemek için yeni sürümün klasörünü aynı yere çıkarıp `chrome://extensions` sayfasında eklentinin
+⟳ (yeniden yükle) düğmesine basmanız yeterlidir. Zip’in bütünlüğünü sürümdeki `.sha256` dosyasıyla doğrulayabilirsiniz.
+
+> Kurum bilgisayarlarında **Geliştirici modu** politika ile kapatılmış olabilir. Bu durumda eklentinin
+> BT birimi tarafından `ExtensionInstallForcelist` politikasıyla dağıtılması gerekir; eklenti izin istemediği
+> ve ağa çıkmadığı için güvenlik incelemesi kısadır, kaynak kodu bu depodadır.
+
+### Başka bir kurum için derleme
+
+[Node.js](https://nodejs.org) 22.18 veya üstü gerekir.
 
 ```bash
 git clone https://github.com/biyonik/ebys-yazim-denetimi.git
@@ -83,7 +102,7 @@ cd ebys-yazim-denetimi
 npm install
 ```
 
-`ebys.config.json` dosyasına kurumunuzun EBYS adresini yazın:
+`ebys.config.json` dosyasındaki adresi kendi EBYS adresinizle değiştirin:
 
 ```json
 {
@@ -96,10 +115,7 @@ npm install
 npm run build
 ```
 
-Chrome’da `chrome://extensions` → **Geliştirici modu** → **Paketlenmemiş öğe yükle** → `dist/` klasörünü seçin.
-
-> **Kurum BT birimleri için:** Eklenti `ExtensionInstallForcelist` politikasıyla tüm bilgisayarlara dağıtılabilir.
-> İzin istemediği ve ağa çıkmadığı için güvenlik incelemesi kısa sürer; kaynak kodu bu depodadır.
+Ardından yukarıdaki 2. ve 3. adımlarla `dist/` klasörünü yükleyin.
 
 ## Nasıl çalışır?
 
@@ -189,6 +205,11 @@ Kural tabanlı bir denetleyicidir; cümlenin anlamını yorumlamaz.
 
 Kılavuz’un Ocak 2023 ve Şubat 2025 baskıları karşılaştırıldı; farklar (*unvan/ünvan*, tekit yazısının düzeyi)
 [docs/MIMARI.md](docs/MIMARI.md) içinde.
+
+## Sürümler
+
+Değişiklikler: [CHANGELOG.md](CHANGELOG.md). GitHub’da bir sürüm yayımlandığında `.github/workflows/release.yml`
+testleri koşar, eklentiyi derler ve kuruluma hazır zip’i sürüme ekler.
 
 ## Lisans
 

@@ -1,0 +1,41 @@
+name: Sürüm paketi
+
+# GitHub'da bir sürüm (Release) yayımlandığında çalışır: testleri koşar, eklentiyi
+# derler ve kuruluma hazır zip'i sürüme ekler. Sürüm etiketi package.json ile aynı olmalı (v0.4.0).
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Etiket ve sürüm uyumu
+        run: |
+          v="v$(node -p "require('./package.json').version")"
+          tag="${{ github.event.release.tag_name }}"
+          if [ "$v" != "$tag" ]; then echo "::error::Etiket $tag, package.json $v"; exit 1; fi
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Paketle
+        run: |
+          name="ebys-yazim-denetimi-${{ github.event.release.tag_name }}-meb"
+          mkdir -p pkg && cp -r dist "pkg/$name"
+          (cd pkg && zip -qr "../$name.zip" "$name")
+          sha256sum "$name.zip" > "$name.zip.sha256"
+      - name: Sürüme ekle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" ebys-yazim-denetimi-*.zip ebys-yazim-denetimi-*.zip.sha256 --clobber
