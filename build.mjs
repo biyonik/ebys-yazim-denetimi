@@ -42,7 +42,7 @@ for (const f of ['content.js', 'bridge.js', 'background.js', 'popup.js']) {
 }
 
 // Statik dosyalar: simgeler, araç çubuğu penceresi, dayanak belgeler (PDF)
-cpSync('assets/icons', 'dist/icons', { recursive: true });
+cpSync('assets/icons', 'dist/icons', { recursive: true, filter: (p) => !p.replaceAll('\\', '/').includes('/kaynak') });
 cpSync('assets/kaynak', 'dist/kaynak', { recursive: true });
 cpSync('src/popup/popup.html', 'dist/popup.html');
 

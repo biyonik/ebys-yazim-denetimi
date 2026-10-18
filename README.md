@@ -53,7 +53,7 @@ pip install pymupdf
 python scripts/build-ref-index.py
 ```
 
-Simge değişirse: `python scripts/make-icons.py yeni-simge.png` (1024×1024, şeffaf arka plan).
+Simge kaynakları `assets/icons/kaynak/` altında (büyük, dar kadraj, 16 px için sade çizim); değişirse `python scripts/make-icons.py`.
 
 ## Testler
 
