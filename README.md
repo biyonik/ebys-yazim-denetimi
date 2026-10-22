@@ -42,6 +42,7 @@ kurala dayandığını gösterir. Dayanağa tıklayınca ilgili belge doğru say
 | **Birleşik yazım** | `arzederim → arz ederim`, `kayıt edildi → kaydedildi`, `baş savcı → başsavcı`, `önyargı → ön yargı` |
 | **Sayılar ve kısaltmalar** | `2’şer → ikişer`, `ikiyüz → iki yüz`, `1500000 TL → 1.500.000 TL`, `T.B.M.M. → TBMM` |
 | **Resmî Yazışma Yönetmeliği** | Konu, Sayı, İlgi ve Ek biçimi; harfle sıralama (c, ç, d…); “arz ve rica”; GÜNLÜDÜR/ACELE; “a.” ve “V.”; paragraflar arasında boş satır |
+| **Kurum adları** | `Milli Eğitim Banlığı → Bakanlığı`, `Müdürlügüne → Müdürlüğüne`, `MİLLİ EĞTİM → EĞİTİM`, `İlçe Mili Eğitim → Milli / Millî` |
 | **Konu alanı** | Evrak Bilgileri’ndeki Konu satırı (editörün dışında): kelimelerin baş harfi büyük, sonda nokta yok, `hk. → Hakkında`, yazım hataları |
 | **Resmî Yazışma Kuralları Kılavuzu** | Muhatap yazımı, “tarihli ve … sayılı” kalıbı, kişisel anlatım (*planladık → planlanmıştır*), anlatım bozuklukları, tekit yazısı, “sık yanlış kullanılan kelimeler” tablosunun tamamı |
 
@@ -202,6 +203,8 @@ Kural tabanlı bir denetleyicidir; cümlenin anlamını yorumlamaz.
 - **Bağlama bağlı durumlarda karar vermez, uyarır.** “bende / ben de”, “hala / hâlâ”, “o da / oda” gibi.
 - **Cümle yapısı çözümlemesi yok.** Kılavuz’daki özne/yüklem eksikliği ve tamlama kusurları bilerek denetlenmez;
   tahmine dayalı uyarı, güveni yanlış alarmlarla bozar.
+- **Kurum adlarında** büyük harfli kelimeler yalnızca kurum adı olduğu anlaşılan öbeklerde denetlenir. Uzun köklü
+  gerçek kelime hataları (*Eğitim* yerine *Eğitmen*) bir başka doğru adla ayırt edilemediği için yakalanmaz.
 - **Sözlükte olmayan özel adlar** (soyadları, yer adları) cümle başında uyarı alabilir. **Yoksay** o oturum için susturur.
 - **Biçim denetimi kapsam dışı:** yazı tipi, kenar boşlukları, girinti ve üstveri EBYS’nin sorumluluğundadır.
 

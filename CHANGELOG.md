@@ -1,5 +1,19 @@
 # Sürüm notları
 
+## v0.5.1 — 22.10.2026
+
+- **Kurum adlarında yazım denetimi** (`yazim.kurum`). Genel sözlük kuralı büyük harfle başlayan kelimeyi özel ad
+  sayıp atladığı için kurum adlarındaki yanlışlar görünmüyordu. Artık:
+  - sözlük dışı kelime kurum adı içindeyse **hata**: `Müdürlügüne → Müdürlüğüne`, `MİLLİ EĞTİM → EĞİTİM`,
+    `Bakanlğımıza → Bakanlığımıza` (yalnızca Türkçe karakter farkı olanlar "Tümünü düzelt"e girer);
+  - sözlükte bulunan ama kurum adında yanlış olan kelime **uyarı**: `Milli Eğitim Banlığı → Bakanlığı`
+    (ban + -lık), `İlçe Mili Eğitim → Milli / Millî`, `Altıeylül Kaymaklığına → Kaymakamlığına`; küçük harfle
+    yazılmış `banlığımızda` da yakalanır.
+- Kurum adı sözlüğü: bakanlıklar, Cumhurbaşkanlığına bağlı kurumlar, MEB merkez ve taşra birimleri, okul türleri,
+  unvanlar (`src/core/lexicon/kurumlar.ts`). “Milli” ve “Millî” ikisi de doğru kabul edilir; öneride belgenin
+  kendi kullandığı yazım öne alınır.
+- Ayrıntı ve ölçümler: `docs/MIMARI.md` § 5d.
+
 ## v0.5.0 — 22.10.2026
 
 - **Konu alanı denetimi.** Evrak Oluştur → Bilgileri sekmesindeki Konu kutusu

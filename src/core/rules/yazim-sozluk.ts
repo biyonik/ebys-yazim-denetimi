@@ -14,7 +14,8 @@ import { prevNonSpace } from '../tokenizer.ts';
  * kurulamıyorsa işaretlenir.
  *
  * ── Ne işaretlenmez (yanlış pozitif kalkanı) ────────────────────────────
- *  - Cümle içinde büyük harfle başlayan kelime: özel ad olabilir (Kocatepe, Gökalp)
+ *  - Cümle içinde büyük harfle başlayan kelime: özel ad olabilir (Kocatepe, Gökalp).
+ *    Kurum adlarının içi bu kalkanın arkasında kalmasın diye ayrıca kurum-adi.ts denetler.
  *  - Tamamı büyük harfli kelime: kısaltma ya da başlık (TBMM, DETSİS, KARAYOLLARI)
  *  - Noktayla biten bilinen kısaltma (vb., bkz., çev.) ve alan adı/e-posta parçaları
  *  - Kesmeli yazılmış kelimeler (özel ad kuralları ayrıca denetler)

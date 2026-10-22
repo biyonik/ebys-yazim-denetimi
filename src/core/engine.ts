@@ -9,6 +9,7 @@ import { birlesikFiil, birlesikFiilBitisik } from './rules/birlesik-fiil.ts';
 import { baglacKurallari, miUyum } from './rules/baglac.ts';
 import { buyukHarf } from './rules/buyuk-harf.ts';
 import { yazimSozluk } from './rules/yazim-sozluk.ts';
+import { kurumAdi } from './rules/kurum-adi.ts';
 import { YONETMELIK_RULES } from './rules/yonetmelik.ts';
 import { KILAVUZ_RULES } from './rules/kilavuz.ts';
 import { capitalizeTr, isLowerLetter } from './turkish.ts';
@@ -32,6 +33,7 @@ export const DEFAULT_RULES: Rule[] = [
   ciftBosluk,
   kelimeTekrari,
   buyukHarf,
+  kurumAdi,
   yazimSozluk,
   ...YONETMELIK_RULES,
 ];

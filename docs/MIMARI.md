@@ -168,6 +168,45 @@ sıra numarası (`:3:`) kuruma göre değişebileceği için kullanılmaz.
 | Düzeltmeden sonra `input` + `change` olayı | PrimeFaces değeri satır içi `onchange` ile sunucu modeline alır; olay tetiklenmezse kaydedilen konu eski hâli kalır. Satır içi işleyici DOM olayına bağlıdır, içerik betiğinin yalıtılmış dünyasından tetiklenebilir | `value` atayıp bırakmak: ekranda düzelmiş, kayıtta düzelmemiş konu — en tehlikeli sonuç |
 | Alan görünmezken sayaç gizli | Sekme değişince alan `display:none` olur; sayaç boşlukta asılı kalmasın | — |
 
+## 5d. Kurum adlarındaki yazım hataları (`kurum-adi.ts`, v0.5.1)
+
+Çıkış noktası gerçek bir yazı: "Milli Eğitim **Banlığı**". Genel sözlük kuralı bunu iki ayrı nedenle görmüyordu:
+
+1. **Büyük harf kalkanı.** Cümle içinde büyük harfle başlayan sözlük dışı kelime özel ad sayılıp atlanır (soyadları,
+   yer adları); tamamı büyük harfli kelime kısaltma sayılır. Bu yüzden "Bakanlğımıza", "Müdürlügüne", "MİLLİ EĞTİM"
+   de sessizdi — küçük harfle yazılsalar yakalanırlardı.
+2. **Gerçek kelime hatası.** "banlık" sözlüğe göre kurulabilir: *ban* (yasaklama) + *-lık*. Yalnızca sözlüğe bakan
+   bir denetleyici bunu kendi başına ayıramaz.
+
+Çözüm, kalkanı kaldırmak değil, **bağlam bilinen yerde açmaktır**: büyük harfli öbek bir kurum başı içeriyorsa
+(Bakanlığı, Müdürlüğü, Lisesi…) içinde geçebilecek kelimeler de büyük ölçüde bellidir. Kelime dağarcığı ve ikili
+komşuluklar `lexicon/kurumlar.ts`'teki ~250 ad ve unvandan türetilir.
+
+| Sınıf | Örnek | Kanıt | Önem |
+|---|---|---|---|
+| 1. Sözlük dışı kelime, kurum adında | `Müdürlügüne`, `Eğtim`, `BAKANLIGI`, `Bakanlğımıza` | Öbekte kurum başı var ya da kelimenin kendisi uzun, ayırt edici bir başa (bakanlığ, müdürlüğ…) yakın | hata; yalnızca Türkçe karakter farkı tek önerideyse "Tümünü düzelt" |
+| 2. Sözlükte var, bilinen ikilide yanlış | `Mili Eğitim` (mil + -i), `Terbiye Kurlu` (kur + -lu) | Komşu kelime TAM biliniyor ve ikili listede var; çözümlemenin kökü ≤ 3 harf | uyarı |
+| 3. Kurum başına yakın türetme | `Banlığı`, `banlığımızda`, `Altıeylül Kaymaklığına` | "-lık" kökü bir başın köküne ≤ 2 harf uzak; türetme sözlükte madde değil | uyarı |
+
+**Yanlış alarm kalkanları ve ölçümle bulunanlar.** Kural 75 bin kelimelik derlemde (Yönetmelik, Kılavuz, örnek
+yazılar) ve sözlükteki her kökün "-lık" türetmesinde (≈41 bin biçim) denendi; her tur bir kalkan doğurdu:
+
+| Ölçümde çıkan | Kalkan |
+|---|---|
+| `Başkanı`, `Yardımcısı` (unvan) → "Başkanlık" önerisi | 2. sınıf yalnızca kökü ≤ 3 harfli çözümlemelerde: uzun köklü geçerli kelime başka bir kelimenin çekimidir (`Başkanı`, `İşletmeleri`, `Yazı İşleri`) |
+| `Başbakanlığın` → "Başkanlığın" | Kökü sözlükte olan türetmede yalnızca EKSİK harf kabul edilir: `kaymak ⊂ kaymakam` uyarılır, `başbakan`, `veli`, `baba` uyarılmaz |
+| `sağlığı`, `birliği`, `değişikliği` başka türetmelerin hedefi oluyordu | "-lık" karşılaştırması yalnızca kurum BAŞLARI ve ≥ 4 harfli köklerle (şef, amir dışarıda) |
+| Bilinmeyen özel adlar (`Abanlığı`) kısa başlara (`ajan`, `okul`) benziyordu | Kelimenin kendisinin baş sayılması için ≥ 6 harfli ayırt edici biçim |
+| Adres parçası `…/Cumhurbaskanligi` | `/` komşusu olan kelime atlanır |
+| `Milli` / `Millî` | Düzeltme işareti yok sayılır; Kılavuz örnekleri ikisini de kullanır. Öneride belgenin kendi tercihi öne alınır |
+
+Son durumda derlemde 6 işaret kaldı; hepsi Kılavuz'un "sık yanlış yazılan kelimeler" tablosundaki gerçek yanlışlar
+(`Ünüverste`, `Ünversite`). Maliyet: 9 bin kelimede ~17 ms (kelime başına sonuçlar saklanır).
+
+**Bilerek bırakılanlar.** Uzun köklü gerçek kelime hataları (`Eğitim` yerine `Eğitmen`) ve listede olmayan bir adın
+içindeki gerçek kelime hataları yakalanmaz; bunlar başka bir doğru adla ayırt edilemez. Genel istatistik dil modeli,
+eklentinin çevrimdışı ve küçük kalma ilkesiyle uyuşmadığı için kullanılmadı.
+
 ## 6. CKEditor 4 entegrasyonunda öğrendiklerimiz
 
 1. **Belge yeniden yazılır.** `setData()` ve kaynak modundan dönüş iframe belgesini yeniden oluşturur. Her denetim döngüsünde belge kimliği doğrulanır; köprüden `contentDom` olayı da gelir.
@@ -185,6 +224,8 @@ sıra numarası (`:3:`) kuruma göre değişebileceği için kullanılmaz.
 | `yazim.sozluk` | Sözlükte kurulamayan kelime + öneri | hata / uyarı | Cümle içi büyük harf (özel ad), tamamı büyük (kısaltma), noktalı kısaltma, URL/e-posta, `6 ncı`, tırnaktan sonraki ek, birim |
 | `baglac.*.morf` | `kitabıda`, `geldide`, `gelecekmi` | hata | Bütün kelime geçerliyse hiç bakılmaz (`kapıda`, `maddede`) |
 | `yazim.yaygin` | Sık yanlışlar + **Kılavuz s.54 tablosunun tamamı** (birim testi her satırı doğrular) + §13.6.1 ayrı yazılanlar (`önyargı`, `yanısıra`, `olağandışı`) | hata / uyarı | `bir takım`, `bu gün`, `göz altı`, `direk`, `içtüzük`, `anadili` yalnızca uyarı |
+| `yazim.kurum` | Kurum adında sözlük dışı kelime: `Müdürlügüne`, `MİLLİ EĞTİM`, `Bakanlğımıza` (bkz. 5d) | hata | Öbekte kurum başı yoksa; 4 harften kısa; `/` komşusu |
+| `yazim.kurum.anlam` | Kurum adında gerçek kelime hatası: `Banlığı`, `Mili Eğitim`, `Kaymaklığına` | uyarı | Bkz. 5d kalkan tablosu |
 | `yazim.birlesik-fiil` | `arzederim` → `arz ederim` | hata | Ses olaylılar |
 | `yazim.birlesik-fiil-bitisik` | `kayıt edildi` → `kaydedildi`, `red etmek` → `reddetmek` | hata | — |
 | `kesme.sayi` | `2026da`, `3'de` → `3'te`, `11.00'da` → `11.00'de` | hata | `2B`, `210x297`; saatte sıfır grubu okunmaz |

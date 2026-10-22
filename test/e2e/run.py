@@ -392,6 +392,31 @@ def main():
             )
             ok(True, "<p><br></p> boş paragrafı da algılandı")
 
+            print("12b) Kurum adları (tarayıcıda)")
+            html = ("<p>Milli Eğitim Banlığı ile yapılan yazışmalar İlçe Millî Eğitim Müdürlügüne "
+                    "gönderilmiştir.</p><p>Bilgilerinize arz ederim.</p>")
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, html])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-uyari');
+                           return h && [...h].some(r => r.toString() === 'Banlığı'); }""",
+                timeout=5000,
+            )
+            fk = [fr for fr in page.frames if fr != page.main_frame][0]
+            h = highlights(fk)
+            ok("Banlığı" in h["uyari"], f"gerçek kelime hatası (ban + -lık) uyarı: {h['uyari']}")
+            ok("Müdürlügüne" in h["hata"], f"büyük harfli sözlük dışı kurum adı hata: {h['hata']}")
+            click_word(page, fk, "Banlığı")
+            wait_pop(page)
+            page.locator("ebys-yazim-ui .pop .sug", has_text="Bakanlığı").first.click()
+            page.wait_for_timeout(300)
+            ok("Milli Eğitim Bakanlığı ile" in get_data(page), "öneri uygulandı: Bakanlığı")
+            page.locator("ebys-yazim-ui .badge").click()
+            page.locator("ebys-yazim-ui .panel .fixall").click()
+            page.wait_for_timeout(300)
+            ok("Müdürlüğüne" in get_data(page), "Tümünü düzelt Türkçe karakteri düzeltti")
+            page.keyboard.press("Escape")
+
             print("13) Performans: 5 sayfalık belge")
             para = ("İlgi (a) yazınızla Bakanlığımıza iletilen talep incelenmiş olup söz konusu hususta "
                     "gerekli değerlendirmelerin yapılabilmesi için ilgili birimlerin görüşlerine başvurulmuştur. "

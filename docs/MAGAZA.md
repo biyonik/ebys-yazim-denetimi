@@ -29,6 +29,7 @@ NELERİ DENETLER?
 • Yazım: Türkçenin ek yapısını tanıyan, yaklaşık 35 bin köklü sözlük (yapilacak → yapılacak, orjinal → orijinal).
 • Dil bilgisi: ayrı yazılan de/da, ki, mi (banada → bana da); özel adlara ve sayılara gelen ekler (Ahmetin → Ahmet’in, 3de → 3’te); birleşik fiiller (arzederim → arz ederim).
 • Resmî Yazışma Yönetmeliği: Konu, Sayı, İlgi ve Ek biçimi; tutarların yazımı, kısaltma, kapanış ifadesi, süreli yazı ibaresi, imza, paragraflar arasında boş satır.
+• Kurum adları: büyük harfle yazıldığı için genel denetimden kaçan yanlışlar (Milli Eğitim Banlığı → Bakanlığı, Müdürlügüne → Müdürlüğüne, MİLLİ EĞTİM → EĞİTİM).
 • Konu alanı: Evrak Bilgileri’ndeki Konu satırı da denetlenir (kelimelerin baş harfi büyük, sonda nokta yok, hk. → Hakkında).
 • Resmî Yazışma Kuralları Kılavuzu: kesme işareti, virgül, kısaltma ekleri, sayılar, büyük harf, düzeltme işareti, anlatım bozuklukları, kişisel anlatım, muhatap yazımı ve “sık yanlış kullanılan kelimeler” tablosunun tamamı.
 
