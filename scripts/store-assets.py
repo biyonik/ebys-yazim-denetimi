@@ -33,7 +33,10 @@ SHOTS = [
     ("3-tumunu-duzelt", "panel.png", "Tümünü düzelt",
      ["Tek doğru cevabı olan sorunlar tek tıkla düzelir.",
       "Anlamı değiştirebilecek olanlar size bırakılır. Tek <b>Ctrl+Z</b> hepsini geri alır."]),
-    ("4-gizlilik", "pencere.png", "Metin bilgisayarınızdan çıkmaz",
+    ("4-konu", "konu.png", "Konu alanı da denetlenir",
+     ["Evrak Bilgileri’ndeki Konu satırı da yazılırken denetlenir.",
+      "Kelimelerin baş harfi büyük yazılır, sonda nokta konmaz; <b>hk. → Hakkında</b>. Düzeltme EBYS’ye işlenir."]),
+    ("5-gizlilik", "pencere.png", "Metin bilgisayarınızdan çıkmaz",
      ["Hiçbir izin istemez, ağa bağlanmaz, veri toplamaz.",
       "Sözlük ve dayanak belgeler eklentinin içindedir. Kaynak kodu açıktır (Apache&#8209;2.0)."]),
 ]

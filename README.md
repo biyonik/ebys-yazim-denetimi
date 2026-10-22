@@ -42,6 +42,7 @@ kurala dayandığını gösterir. Dayanağa tıklayınca ilgili belge doğru say
 | **Birleşik yazım** | `arzederim → arz ederim`, `kayıt edildi → kaydedildi`, `baş savcı → başsavcı`, `önyargı → ön yargı` |
 | **Sayılar ve kısaltmalar** | `2’şer → ikişer`, `ikiyüz → iki yüz`, `1500000 TL → 1.500.000 TL`, `T.B.M.M. → TBMM` |
 | **Resmî Yazışma Yönetmeliği** | Konu, Sayı, İlgi ve Ek biçimi; harfle sıralama (c, ç, d…); “arz ve rica”; GÜNLÜDÜR/ACELE; “a.” ve “V.”; paragraflar arasında boş satır |
+| **Konu alanı** | Evrak Bilgileri’ndeki Konu satırı (editörün dışında): kelimelerin baş harfi büyük, sonda nokta yok, `hk. → Hakkında`, yazım hataları |
 | **Resmî Yazışma Kuralları Kılavuzu** | Muhatap yazımı, “tarihli ve … sayılı” kalıbı, kişisel anlatım (*planladık → planlanmıştır*), anlatım bozuklukları, tekit yazısı, “sık yanlış kullanılan kelimeler” tablosunun tamamı |
 
 Ayrıntılı kural kataloğu: [docs/MIMARI.md](docs/MIMARI.md#7-kural-katalo%C4%9Fu)
@@ -50,6 +51,10 @@ Ayrıntılı kural kataloğu: [docs/MIMARI.md](docs/MIMARI.md#7-kural-katalo%C4%
 <tr>
 <td width="50%"><img src="docs/img/kilavuz.png" alt="Kılavuz atıflı uyarı"><br><sub>Bağlama bağlı durumda iki seçenek; dayanağa tıklayınca Kılavuz’un ilgili sayfası açılır.</sub></td>
 <td width="50%"><img src="docs/img/panel.png" alt="Sorun paneli ve Tümünü düzelt"><br><sub>Sorun paneli: <b>Tümünü düzelt</b> yalnızca tek doğru cevabı olan sorunları düzeltir.</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/img/konu.png" alt="Konu alanı denetimi"><br><sub>Konu alanı: sağdaki sayaç sorunları listeler; düzeltme EBYS’nin kendi alanına işlenir.</sub></td>
+<td width="50%"></td>
 </tr>
 </table>
 
@@ -60,6 +65,8 @@ Ayrıntılı kural kataloğu: [docs/MIMARI.md](docs/MIMARI.md#7-kural-katalo%C4%
   (“Kılavuz §13.6.3”, “Yönetmelik m.16(4)”) tıklanabilir.
 - Editörün sağ altındaki rozet **sorun panelini** açar. **Tümünü düzelt** anlamı değiştirebilecek
   sorunlara (*bende / ben de*, *hala / hâlâ*) hiçbir zaman dokunmaz.
+- **Konu** alanında çizgi çizilemez (düz metin kutusudur); sorun varsa alanın sağında renkli bir sayaç çıkar,
+  tıklayınca liste açılır. Düzeltme alana yazılır ve EBYS’ye bildirilir (`change` olayı), kaydedilen konu düzeltilmiş hâlidir.
 - Her düzeltme, toplu düzeltme dahil, CKEditor’ün geri al geçmişine **tek adım** olarak girer (Ctrl+Z).
 - Belgenin biçimine (kalın, italik, tablo) dokunulmaz; kaydedilen evrakta eklentiden iz kalmaz.
 

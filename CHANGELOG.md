@@ -1,5 +1,18 @@
 # Sürüm notları
 
+## v0.5.0 — 22.10.2026
+
+- **Konu alanı denetimi.** Evrak Oluştur → Bilgileri sekmesindeki Konu kutusu
+  (`textarea.metadataKonuTextArea`) yazılırken denetlenir: kelimelerin baş harfi büyük (m.13(1)),
+  sonda nokta yok, `hk. → Hakkında`, yazım hataları. Düz metin kutusunun içine çizgi çizilemediği için
+  sorunlar alanın sağındaki sayaçta ve tıklayınca açılan listede gösterilir. Düzeltme sonrası `input` ve
+  `change` olayları tetiklenir; EBYS (PrimeFaces) değeri kendi modeline alır.
+- Kısaltmanın açık hâlini isteyen kural (m.16(11)) Konu’da uygulanmaz: açık hâl metinde verilir.
+- Düzeltildi: `hk.` önerisi bir sonraki denetimde bayat sayılıyordu (işaretli metin ile aralık uyuşmuyordu).
+- Düzeltildi: konu satırında `e-Yazışma` gibi `e-` önekli adlar büyük harf uyarısı almıyor.
+- Deneme sayfası ve mağaza görselleri MEB EBYS düzenine uyarlandı: Sayı/Konu editör metninden çıkarıldı,
+  Konu ayrı alan olarak eklendi.
+
 ## v0.4.2 — 22.10.2026
 
 - Yanlış alarm giderildi: metinde “tekit” geçtiğinde “ilgi tutulmalı” uyarısı verilmiyor. MEB EBYS’de

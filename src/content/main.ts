@@ -13,7 +13,8 @@
  *      (ör. editör DOM'dan sessizce kaldırıldı)
  */
 import { EVT_EVENT, type BridgeEvent } from '../shared/protocol.ts';
-import { EditorSession } from './session.ts';
+import { EditorSession, ignored } from './session.ts';
+import { KONU_SELECTOR, KonuField } from './konu-field.ts';
 import { warmUp } from '../core/morph/analyzer.ts';
 
 const sessions = new Map<HTMLIFrameElement, EditorSession>();
@@ -23,7 +24,23 @@ function editorNameOf(iframe: HTMLIFrameElement): string | null {
   return container ? container.id.slice(4) : null;
 }
 
+const konuFields = new Map<HTMLTextAreaElement, KonuField>();
+
+/** Evrak Oluştur → Bilgileri sekmesindeki Konu alanı (editörden ayrı form alanı) */
+function scanKonu(): void {
+  document.querySelectorAll<HTMLTextAreaElement>(KONU_SELECTOR).forEach((t) => {
+    if (!konuFields.has(t)) konuFields.set(t, new KonuField(t, ignored));
+  });
+  for (const [t, k] of konuFields) {
+    if (!t.isConnected) {
+      k.dispose();
+      konuFields.delete(t);
+    }
+  }
+}
+
 function scan(): void {
+  scanKonu();
   document.querySelectorAll<HTMLIFrameElement>('iframe.cke_wysiwyg_frame').forEach((f) => {
     if (sessions.has(f)) return;
     const name = editorNameOf(f);
@@ -75,9 +92,13 @@ setInterval(() => {
     s.ensureAttached(); // belge değiştiyse yeniden bağlanır ve denetler
     s.positionBadge();
   }
+  konuFields.forEach((k) => k.position());
 }, 1000);
 
-const reposition = () => sessions.forEach((s) => s.positionBadge());
+const reposition = () => {
+  sessions.forEach((s) => s.positionBadge());
+  konuFields.forEach((k) => k.position());
+};
 window.addEventListener('resize', reposition, { passive: true });
 window.addEventListener('scroll', reposition, { passive: true, capture: true });
 
@@ -88,5 +109,5 @@ scan();
 const idle = (cb: () => void) =>
   'requestIdleCallback' in window ? requestIdleCallback(cb, { timeout: 3000 }) : setTimeout(cb, 500);
 idle(() => {
-  if (document.querySelector('iframe.cke_wysiwyg_frame')) warmUp();
+  if (document.querySelector(`iframe.cke_wysiwyg_frame, ${KONU_SELECTOR}`)) warmUp();
 });

@@ -88,10 +88,11 @@ const konu: Rule = {
         if (depth > 0 || tok === '(' || tok === ')') continue;
         const at = vStart + w.index!;
         if (tok === 'hk' && value[w.index! + 2] === '.') {
-          out.push(issue('yonetmelik.konu.hk', at, at + 3, tok, 'Konuda kısaltma yerine açık yazım tercih edilir: "Hakkında".', 'oneri', K('10, Örnekler'), ['Hakkında']));
+          out.push(issue('yonetmelik.konu.hk', at, at + 3, 'hk.', 'Konuda kısaltma yerine açık yazım tercih edilir: "Hakkında".', 'oneri', K('10, Örnekler'), ['Hakkında']));
           continue;
         }
         if (TITLE_LOWER.has(trLower(tok))) continue;
+        if (tok === 'e' && value[w.index! + 1] === '-') continue; // e-Yazışma, e-Devlet: TDK yazımı küçük e
         if (isLowerLetter(tok[0]!)) {
           out.push(issue('yonetmelik.konu.buyuk-harf', at, at + tok.length, tok, 'Konu satırında kelimelerin baş harfi büyük yazılır.', 'hata', Y('13(1)'), [capitalizeTr(tok)]));
         }

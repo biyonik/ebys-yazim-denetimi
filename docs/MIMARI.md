@@ -147,6 +147,27 @@ Uyarının dayanağı ("Yönetmelik m.16(4), Kılavuz §31") `ref-links.ts` ile 
 
 Arka plan mesajı yalnızca `{belge, sayfa}` taşır, belge adı beyaz listeden, sayfa aralıktan doğrulanır.
 
+## 5c. Konu alanı
+
+MEB EBYS'de (Belgenet) Sayı, Konu ve İlgi editörde değil, **Bilgileri** sekmesindeki ayrı form alanlarındadır.
+Sayı sistem üretir, İlgi seçilerek eklenir; elle yazılan ve yazım hatası taşıyabilen tek alan **Konu**'dur:
+
+```html
+<textarea id="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea"
+          class="… metadataKonuTextArea …" maxlength="500" onchange="PrimeFaces.ab({…})">
+```
+
+Seçici sınıf adına ve id sonekine dayanır (`textarea.metadataKonuTextArea, textarea[id$=":konuTextArea"]`); listedeki
+sıra numarası (`:3:`) kuruma göre değişebileceği için kullanılmaz.
+
+| Karar | Neden | Alternatif ve bedeli |
+|---|---|---|
+| Aynı çekirdek, `"Konu: "` önekiyle | Yönetmelik m.13(1) kuralları satırı bu önekle tanır; öneki eklemek, kuralları ikinci kez yazmaktan sağlamdır. Sonuçlar önek kadar kaydırılır | Ayrı kural seti: aynı kuralın iki kopyası, zamanla ayrışır |
+| Kısaltma tanımı kuralı (m.16(11)) Konu'da kapalı | Açık hâl metinde verilir; konuda `LGS` için uyarı gürültüdür | — |
+| İşaret yerine alanın sağında sayaç + liste | `<textarea>` içindeki metin DOM düğümü değildir; Highlight API çizemez. Arkasına hizalanmış bir "ayna" katmanı mümkündür ama kaydırma, satır kırma ve yazı tipi eşlemesi kırılgandır | Ayna katmanı: daha tanıdık görünüm, çok daha fazla bakım |
+| Düzeltmeden sonra `input` + `change` olayı | PrimeFaces değeri satır içi `onchange` ile sunucu modeline alır; olay tetiklenmezse kaydedilen konu eski hâli kalır. Satır içi işleyici DOM olayına bağlıdır, içerik betiğinin yalıtılmış dünyasından tetiklenebilir | `value` atayıp bırakmak: ekranda düzelmiş, kayıtta düzelmemiş konu — en tehlikeli sonuç |
+| Alan görünmezken sayaç gizli | Sekme değişince alan `display:none` olur; sayaç boşlukta asılı kalmasın | — |
+
 ## 6. CKEditor 4 entegrasyonunda öğrendiklerimiz
 
 1. **Belge yeniden yazılır.** `setData()` ve kaynak modundan dönüş iframe belgesini yeniden oluşturur. Her denetim döngüsünde belge kimliği doğrulanır; köprüden `contentDom` olayı da gelir.
@@ -276,4 +297,4 @@ Bu fazlar bir "MVP sonra genişlet" planı değil; tek bir bütün ürünün in�
 1. **EBYS'nin gerçek adresi** (`ebys.config.json`).
 2. **Kurum bilgisayarlarındaki Chrome sürümü.** `world: "MAIN"` Chrome 111 ister. Windows 7/8.1'de Chrome 109'da kalmışsa köprü `<script src>` enjeksiyonuyla yüklenmeli.
 3. **Etiket widget'ları.** EBYS etiket alanlarını `contenteditable=false` olarak mı üretiyor? Gerçek DOM ile doğrulanmalı.
-4. ~~Sayı, Konu, İlgi alanlarının yeri~~ — **karar: kapsam dışı.** Ayrı form alanları denetlenmez. Editör içinde yazılırlarsa Yönetmelik kuralları çalışır; satır yoksa sessiz kalır.
+4. ~~Sayı, Konu, İlgi alanlarının yeri~~ — **çözüldü (v0.5.0).** Ayrı form alanlarıdır. Konu denetlenir (bkz. 5c); Sayı sistem üretir, İlgi seçilerek eklenir. Editör içinde yazılırlarsa (başka kurumlar) Yönetmelik kuralları yine çalışır; satır yoksa sessiz kalır.

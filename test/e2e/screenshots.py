@@ -21,7 +21,6 @@ ED = "yeniGidenEvrakForm:ckeditorInstance_window1"
 
 LETTER = (
     '<p style="text-align:center"><strong>T.C.</strong><br><strong>ÖRNEK KURUM BAŞKANLIĞI</strong></p>'
-    "<p>Sayı&nbsp;&nbsp;&nbsp;&nbsp;: E-12345678-010.06-123<br>Konu&nbsp;&nbsp;&nbsp;: Eğitim programı</p>"
     "<p>İlgi yazınızla talep edilen eğitim programı Başkanlığımız’da hazırlanmış olup programın 2026da "
     "başlaması planlanmaktadır. Eğitime yanlız birim amirleri katılacak, diğer personel banada bildirilen "
     "listeye göre 2'şer kişilik gruplar hâlinde katılacaktır. Diğer birimler hala bilgilendirilmedi.</p>"
@@ -94,6 +93,23 @@ def main():
             shot("kilavuz", "Başkanlığımız")
             shot("panel", panel=True)
             page.keyboard.press("Escape")
+
+            # Konu alanı: EBYS'de editörün dışında, "Bilgileri" sekmesinde ayrı bir form alanı
+            konu = page.locator("textarea.metadataKonuTextArea")
+            konu.fill("eğitim programı hk.")
+            pill = page.locator("ebys-yazim-konu >> .pill")
+            pill.wait_for(state="visible", timeout=3000)
+            pill.click()
+            card = page.locator("ebys-yazim-konu >> .card")
+            card.wait_for(state="visible", timeout=3000)
+            time.sleep(0.3)
+            boxes = [page.locator("table.bilgiler").bounding_box(), pill.bounding_box(), card.bounding_box()]
+            x0 = min(b["x"] for b in boxes) - 10
+            y0 = min(b["y"] for b in boxes) - 10
+            x1 = max(b["x"] + b["width"] for b in boxes) + 10
+            y1 = max(b["y"] + b["height"] for b in boxes) + 10
+            page.screenshot(path=str(OUT / "konu.png"), clip={"x": max(0, x0), "y": max(0, y0), "width": x1 - max(0, x0), "height": y1 - max(0, y0)})
+            print(OUT / "konu.png")
 
             ext_id = (ctx.service_workers[0] if ctx.service_workers else ctx.wait_for_event("serviceworker")).url.split("/")[2]
             pp = ctx.new_page()

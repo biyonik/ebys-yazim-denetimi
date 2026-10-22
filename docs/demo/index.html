@@ -31,6 +31,9 @@
   code { background: #f1f3f4; padding: 1px 5px; border-radius: 4px; font-size: 13.5px; }
   table.layout { width: 100%; background: #fff; border: 1px solid var(--line); border-collapse: collapse; }
   td.ui-edys-editor { padding: 0; }
+  .bilgiler { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-bottom: 0; padding: 10px 12px; }
+  .bilgiler label { font-weight: 600; font-size: 14px; }
+  .bilgiler textarea { width: 360px; height: 28px; font: 14px/1.4 Arial, sans-serif; padding: 4px 6px; resize: none; border: 1px solid #c4c7cc; border-radius: 3px; }
   .bar { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 0; color: var(--muted); font-size: 13px; }
   button { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
   button:hover { background: #f1f3f4; }
@@ -55,10 +58,15 @@
       <li>Altı çizili bir kelimeye tıklayın (ör. <code>banada</code>) ve öneriyi seçin.</li>
       <li>Balonun sağ altındaki <code>Kılavuz §…</code> atfına tıklayın: Kılavuz ilgili sayfasında açılır.</li>
       <li>Editörün sağ altındaki rozete tıklayıp <b>Tümünü düzelt</b>’e basın; <b>Ctrl+Z</b> hepsini tek adımda geri alır.</li>
+      <li><b>Konu</b> alanı da denetlenir: sağındaki sayaca tıklayın. EBYS’de olduğu gibi Sayı, Konu ve İlgi editörde değil, ayrı alanlardadır.</li>
       <li>Kendi metninizi yazın ya da yapıştırın. Metin bu sayfadan hiçbir yere gönderilmez.</li>
     </ol>
   </div>
   <form id="yeniGidenEvrakForm" onsubmit="return false">
+    <div class="bilgiler">
+      <label for="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea">Konu</label>
+      <textarea id="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" class="metadataKonuTextArea" rows="1" maxlength="500"></textarea>
+    </div>
     <table class="layout"><tr><td class="ui-edys-editor">
       <textarea id="yeniGidenEvrakForm:ckeditorInstance_window1" name="yeniGidenEvrakForm:ckeditorInstance_window1"></textarea>
     </td></tr></table>
@@ -75,20 +83,26 @@
 <script>
   var ORNEK =
     '<p style="text-align:center"><strong>T.C.</strong><br><strong>ÖRNEK KURUM BAŞKANLIĞI</strong></p>' +
-    '<p>Sayı&nbsp;&nbsp;&nbsp;&nbsp;: E-12345678-010.06-123<br>Konu&nbsp;&nbsp;&nbsp;: Eğitim programı</p>' +
     '<p>İlgi yazınızla talep edilen eğitim programı Başkanlığımız’da hazırlanmış olup programın 2026da ' +
     'başlaması planlanmaktadır. Eğitime yanlız birim amirleri katılacak, diğer personel banada bildirilen ' +
     'listeye göre 2\'şer kişilik gruplar hâlinde katılacaktır. Diğer birimler hala bilgilendirilmedi.</p>' +
     '<p>Programın orjinal takvimi hizmet te kullanılacak salonlarla birlikte ekte sunulmuştur.</p>' +
     '<p>Bilgilerinize arzederim.</p>';
+  var KONU = 'eğitim programı hk.';
   var ED = 'yeniGidenEvrakForm:ckeditorInstance_window1';
+  var konu = document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea');
+  konu.value = KONU;
   document.getElementById(ED).value = ORNEK;
   CKEDITOR.replace(ED, {
     versionCheck: false, language: 'tr', height: 420, contentsCss: [], bodyClass: 'evrak',
     extraAllowedContent: '*(*);*{*}', removeButtons: 'About',
   });
   CKEDITOR.addCss('body.evrak { font-family: "Times New Roman", serif; font-size: 12pt; line-height: 150%; margin: 16px 24px; }');
-  document.getElementById('sifirla').onclick = function () { CKEDITOR.instances[ED].setData(ORNEK); };
+  document.getElementById('sifirla').onclick = function () {
+    CKEDITOR.instances[ED].setData(ORNEK);
+    konu.value = KONU;
+    konu.dispatchEvent(new Event('input', { bubbles: true }));
+  };
   // Eklenti editörün yanına "ebys-yazim-ui" öğesini ekler; birkaç saniyede gelmezse kurulum notunu göster
   setTimeout(function () {
     if (!document.querySelector('ebys-yazim-ui')) document.getElementById('yok').style.display = 'block';

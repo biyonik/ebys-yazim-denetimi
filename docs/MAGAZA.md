@@ -29,6 +29,7 @@ NELERİ DENETLER?
 • Yazım: Türkçenin ek yapısını tanıyan, yaklaşık 35 bin köklü sözlük (yapilacak → yapılacak, orjinal → orijinal).
 • Dil bilgisi: ayrı yazılan de/da, ki, mi (banada → bana da); özel adlara ve sayılara gelen ekler (Ahmetin → Ahmet’in, 3de → 3’te); birleşik fiiller (arzederim → arz ederim).
 • Resmî Yazışma Yönetmeliği: Konu, Sayı, İlgi ve Ek biçimi; tutarların yazımı, kısaltma, kapanış ifadesi, süreli yazı ibaresi, imza, paragraflar arasında boş satır.
+• Konu alanı: Evrak Bilgileri’ndeki Konu satırı da denetlenir (kelimelerin baş harfi büyük, sonda nokta yok, hk. → Hakkında).
 • Resmî Yazışma Kuralları Kılavuzu: kesme işareti, virgül, kısaltma ekleri, sayılar, büyük harf, düzeltme işareti, anlatım bozuklukları, kişisel anlatım, muhatap yazımı ve “sık yanlış kullanılan kelimeler” tablosunun tamamı.
 
 NASIL ÇALIŞIR?
@@ -60,7 +61,7 @@ Geliştirici: Ahmet ALTUN · https://biyonik.github.io
 | Alan | Dosya |
 |---|---|
 | Mağaza simgesi (128×128) | `assets/icons/icon-128.png` |
-| Ekran görüntüleri (1280×800) | `docs/magaza/ekran-1-yazarken.png` … `ekran-4-gizlilik.png` (bu sırayla) |
+| Ekran görüntüleri (1280×800) | `docs/magaza/ekran-1-yazarken.png` … `ekran-5-gizlilik.png` (bu sırayla) |
 | Küçük tanıtım kutucuğu (440×280) | `docs/magaza/tanitim-kucuk-440x280.png` |
 | Büyük tanıtım kutucuğu (1400×560) | `docs/magaza/tanitim-buyuk-1400x560.png` |
 
@@ -113,7 +114,8 @@ https://biyonik.github.io/ebys-yazim-denetimi/demo/
 1. Underlined words are spelling/grammar issues (Turkish). Click one (e.g. "banada") and pick the suggestion.
 2. Click the citation at the bottom right of the bubble (e.g. "Kılavuz §13.6.3"): the bundled PDF opens in a new tab at the cited page.
 3. Click the badge at the bottom right of the editor, then "Tümünü düzelt" (Fix all).
-4. Click the toolbar icon to see the popup.
+4. Click the badge to the right of the "Konu" (subject) field above the editor; apply a suggestion or "Tümünü düzelt".
+5. Click the toolbar icon to see the popup.
 
 The extension requests no permissions, makes no network requests and collects no data. Source code: https://github.com/biyonik/ebys-yazim-denetimi
 ```

@@ -9,7 +9,7 @@ import { EditorUi } from './ui.ts';
 const DEBOUNCE_MS = 350;
 
 /** Oturum boyunca yoksayılanlar; tüm editörler arasında ortak. Kalıcı değil (bkz. MIMARI.md, Faz 5). */
-const ignored = new Set<string>();
+export const ignored = new Set<string>();
 
 function send(cmd: BridgeCommand): void {
   document.dispatchEvent(new CustomEvent(CMD_EVENT, { detail: JSON.stringify(cmd) }));

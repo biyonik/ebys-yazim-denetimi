@@ -15,11 +15,18 @@
     body { font: 14px system-ui, sans-serif; margin: 24px; background: #f4f5f7; }
     table.layout { width: 820px; background: #fff; border: 1px solid #ccc; }
     td.ui-edys-editor { padding: 0; }
+    table.bilgiler { margin-bottom: 10px; }
+    table.bilgiler label { margin-right: 12px; }
   </style>
 </head>
 <body>
   <h3>Giden Evrak (test)</h3>
   <form id="yeniGidenEvrakForm" onsubmit="return false">
+    <!-- Belgenet "Bilgileri" sekmesindeki Konu alanının kopyası (Evrak Oluştur sayfasından) -->
+    <table class="bilgiler"><tr>
+      <td><label for="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" class="required columnLabelFixWidth">Konu</label></td>
+      <td><textarea id="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" name="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" style="width: 300px; overflow-x: hidden; overflow-wrap: break-word; height: 22px;" class="ui-inputfield ui-inputtextarea ui-widget ui-state-default ui-corner-all required metadataKonuTextArea ui-inputtextarea-resizable" cols="20" rows="1" maxlength="500" onchange="window.__konuChange = (window.__konuChange || 0) + 1" role="textbox" aria-required="true"></textarea></td>
+    </tr></table>
     <table class="layout"><tr>
       <td class="ui-edys-editor">
         <textarea id="yeniGidenEvrakForm:ckeditorInstance_window1" name="yeniGidenEvrakForm:ckeditorInstance_window1"><p style="text-align:center"><strong>T.C.</strong><br><strong>ÖRNEK KURUM BAŞKANLIĞI</strong></p>
