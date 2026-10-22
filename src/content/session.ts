@@ -1,6 +1,7 @@
 import { check, fingerprint } from '../core/engine.ts';
 import { isAutoFixable, MAX_PASSES } from '../core/fix-all.ts';
-import type { Issue } from '../core/types.ts';
+import type { DocMeta, Issue } from '../core/types.ts';
+import { metaKey, readDocMeta } from './doc-meta.ts';
 import { CMD_EVENT, type BridgeCommand } from '../shared/protocol.ts';
 import { Highlighter, isSupported } from './highlighter.ts';
 import { TextIndex } from './text-index.ts';
@@ -35,6 +36,9 @@ export class EditorSession {
   private timer: number | undefined;
   private detachFns: Array<() => void> = [];
   private readonly ui: EditorUi;
+  /** Başlık ve dağıtım (Gereği/Bilgi) bilgisi: editörün dışından, her denetimde ve bekçide tazelenir */
+  private meta: DocMeta = {};
+  private metaSig = '';
 
   constructor(iframe: HTMLIFrameElement, editorName: string) {
     this.iframe = iframe;
@@ -113,7 +117,8 @@ export class EditorSession {
     const t0 = performance.now();
     this.index = TextIndex.build(this.body);
     const t1 = performance.now();
-    this.issues = check(this.index.text, { ignored });
+    this.readMeta();
+    this.issues = check(this.index.text, { ignored, meta: this.meta });
     const t2 = performance.now();
     this.highlighter.render(this.index, this.issues);
     if (__DEV__) {
@@ -135,6 +140,26 @@ export class EditorSession {
   }
 
   /** iframe içi koordinatları barındıran belgenin koordinatlarına çevirir. */
+  private readMeta(): boolean {
+    try {
+      this.meta = readDocMeta(this.iframe);
+    } catch {
+      this.meta = {};
+    }
+    const sig = metaKey(this.meta);
+    const changed = sig !== this.metaSig;
+    this.metaSig = sig;
+    return changed;
+  }
+
+  /**
+   * Bekçiden çağrılır: kullanıcı Bilgileri sekmesinde Gereği/Bilgi seçince editör metni değişmez,
+   * ama arz/rica kararı değişir. Bilgi değiştiyse yeniden denetle.
+   */
+  refreshMeta(): void {
+    if (this.readMeta()) this.runNow();
+  }
+
   private toHostRect(r: DOMRect): DOMRect {
     const f = this.iframe.getBoundingClientRect();
     const cs = getComputedStyle(this.iframe);
@@ -231,7 +256,7 @@ export class EditorSession {
     let applied = 0;
     for (let pass = 0; pass < MAX_PASSES; pass++) {
       const idx = TextIndex.build(this.body);
-      const fixes = check(idx.text, { ignored })
+      const fixes = check(idx.text, { ignored, meta: this.meta })
         .filter(isAutoFixable)
         .sort((a, b) => b.start - a.start);
       let n = 0;

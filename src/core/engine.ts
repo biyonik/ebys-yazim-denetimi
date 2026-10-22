@@ -1,4 +1,4 @@
-import type { Issue, Rule, Severity } from './types.ts';
+import type { DocMeta, Issue, Rule, Severity } from './types.ts';
 import { tokenize } from './tokenizer.ts';
 import { kesmeSayi } from './rules/kesme-sayi.ts';
 import { kesmeOzelAd } from './rules/kesme-ozel-ad.ts';
@@ -10,6 +10,7 @@ import { baglacKurallari, miUyum } from './rules/baglac.ts';
 import { buyukHarf } from './rules/buyuk-harf.ts';
 import { yazimSozluk } from './rules/yazim-sozluk.ts';
 import { kurumAdi } from './rules/kurum-adi.ts';
+import { kapanisHiyerarsi } from './rules/kapanis-hiyerarsi.ts';
 import { YONETMELIK_RULES } from './rules/yonetmelik.ts';
 import { KILAVUZ_RULES } from './rules/kilavuz.ts';
 import { capitalizeTr, isLowerLetter } from './turkish.ts';
@@ -20,6 +21,7 @@ import { capitalizeTr, isLowerLetter } from './turkish.ts';
  * "2'şer" değil "ikişer"), bu yüzden başta.
  */
 export const DEFAULT_RULES: Rule[] = [
+  kapanisHiyerarsi,
   ...KILAVUZ_RULES,
   yayginYanlislar,
   birlesikFiil,
@@ -106,13 +108,15 @@ export interface CheckOptions {
   rules?: Rule[];
   /** "ruleId|metin" parmak izleri — kullanıcının yoksaydıkları */
   ignored?: ReadonlySet<string>;
+  /** Editör dışındaki başlık ve dağıtım bilgisi (gönderen, Gereği/Bilgi) */
+  meta?: DocMeta;
 }
 
 export const fingerprint = (i: Pick<Issue, 'ruleId' | 'text'>): string => `${i.ruleId}|${i.text}`;
 
 export function check(text: string, opts: CheckOptions = {}): Issue[] {
   const tokens = tokenize(text);
-  const ctx = { text, tokens };
+  const ctx = { text, tokens, meta: opts.meta };
   const all: Issue[] = [];
   for (const rule of opts.rules ?? DEFAULT_RULES) {
     try {

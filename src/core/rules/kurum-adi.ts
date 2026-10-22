@@ -29,7 +29,8 @@ import { isUpperLetter, matchCase, trLower } from '../turkish.ts';
  * ── Yanlış alarm kalkanları ─────────────────────────────────────────────
  *  - Önce TAM eşleşme: "Başkanlığı" ile "Bakanlığı" bir harf uzaktır ama ikisi de bilinen baştır.
  *  - İlk harf aynı olmalı (ASCII katlanmış hâliyle); 4 harften kısa kelimeye dokunulmaz.
- *  - Düzeltme işareti yok sayılır: "Milli" ile "Millî" aynıdır (Kılavuz örnekleri ikisini de kullanır).
+ *  - Eşleşmede düzeltme işareti yok sayılır ("Milli" ≈ "Millî"); işaretsiz yazım, kurum adı öbeğinde
+ *    ayrıca ÖNERİ olarak bildirilir (4. sınıf): resmî ad "Millî Eğitim", EBYS başlığı da öyle.
  *  - 3. sınıfta kök 4+ harfli bir sözlük kelimesiyse ("müftü-lük", "bakkal-lık", "başka-lık")
  *    türetme gerçektir, dokunulmaz. Sözlükte kendi maddesi olan türemişler ("başlık", "anlık") da öyle.
  *  - 2. sınıf yalnızca komşu kelime TAM bilindiğinde ve ikili listede varsa çalışır; kişi adları
@@ -252,15 +253,9 @@ function fuzzy(n: string, candidates: Iterable<Entry>): Match[] {
 const isCap = (s: string) => isUpperLetter(s[0] ?? '');
 const baseOf = (raw: string) => raw.split(/['’]/)[0]!;
 
-/**
- * Düzeltme işaretli ("Millî") ve işaretsiz ("Milli") biçim ikisi de önerilir; belge hangisini
- * kullanıyorsa o öne alınır. Kılavuz ikisini de kullandığı için eklenti birini dayatmaz.
- */
-function variants(raw: string, m: Match, rest: string, lowerText: string): string[] {
-  const a = matchCase(raw, m.display) + rest;
-  if (!/[âîû]/.test(m.display)) return [a];
-  const b = matchCase(raw, fold(m.display)) + rest;
-  return lowerText.includes(m.entry.canon) ? [a, b] : [b, a];
+/** Öneri, sözlükteki resmî yazımla: "Millî", "Hâkimler" (düzeltme işareti korunur) */
+function variants(raw: string, m: Match, rest: string): string[] {
+  return [matchCase(raw, m.display) + rest];
 }
 
 interface Slot {
@@ -274,14 +269,12 @@ interface Slot {
 
 export const kurumAdi: Rule = {
   id: 'yazim.kurum',
-  check({ text, tokens }) {
+  check({ tokens }) {
     const out: Issue[] = [];
     let L: Lex | null = null;
-    let lowerText: string | null = null;
-    const lt = () => (lowerText ??= trLower(text));
 
     const emit = (s: Slot, ms: Match[], severity: Severity, realWord: boolean) => {
-      const sugs = [...new Set(ms.slice(0, 3).flatMap((m) => variants(s.raw, m, s.rest, lt())))];
+      const sugs = [...new Set(ms.slice(0, 3).flatMap((m) => variants(s.raw, m, s.rest)))];
       const first = sugs[0]!;
       const message = realWord
         ? `“${s.raw}” sözlükte geçen bir kelime, ama kurum adı olarak “${first}” kastedilmiş olabilir. Kurumun adı buysa yoksayın.`
@@ -362,6 +355,26 @@ export const kurumAdi: Rule = {
       const inst = slots.some(isHead);
 
       slots.forEach((s, i) => {
+        // 4. Düzeltme işareti: kurumun resmî adı "Millî Eğitim", "Hâkimler ve Savcılar Kurulu"
+        const e = ent[i];
+        if (e && inst && /[âîû]/.test(e.canon) && !/[âîû]/.test(trLower(s.raw))) {
+          const base = fold(e.canon);
+          if (s.n.startsWith(base)) {
+            const fixed = matchCase(s.raw, e.canon + s.n.slice(base.length)) + s.rest;
+            out.push({
+              ruleId: 'yazim.kurum.nispet',
+              start: s.tok.start,
+              end: s.tok.start + s.raw.length,
+              text: s.raw,
+              message: `Kurumun resmî adı düzeltme işaretiyle yazılır: “${fixed}”. EBYS başlığındaki kurum adı da bu biçimdedir.`,
+              severity: 'oneri',
+              category: 'yazim',
+              suggestions: [fixed],
+              ref: 'Kılavuz §13.6.8',
+            });
+          }
+          return;
+        }
         if (known[i] || s.n.length < 4) return;
         // Adres parçası: "…/MevzuatMetin/Cumhurbaskanligi"
         if (s.prev?.text === '/' || s.next?.text === '/') return;

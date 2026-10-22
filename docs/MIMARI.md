@@ -198,7 +198,7 @@ yazılar) ve sözlükteki her kökün "-lık" türetmesinde (≈41 bin biçim) d
 | `sağlığı`, `birliği`, `değişikliği` başka türetmelerin hedefi oluyordu | "-lık" karşılaştırması yalnızca kurum BAŞLARI ve ≥ 4 harfli köklerle (şef, amir dışarıda) |
 | Bilinmeyen özel adlar (`Abanlığı`) kısa başlara (`ajan`, `okul`) benziyordu | Kelimenin kendisinin baş sayılması için ≥ 6 harfli ayırt edici biçim |
 | Adres parçası `…/Cumhurbaskanligi` | `/` komşusu olan kelime atlanır |
-| `Milli` / `Millî` | Düzeltme işareti yok sayılır; Kılavuz örnekleri ikisini de kullanır. Öneride belgenin kendi tercihi öne alınır |
+| `Milli` / `Millî` | Eşleşmede işaret yok sayılır; kurum adı öbeğinde işaretsiz yazım ayrı bir **öneri**dir (`yazim.kurum.nispet`): resmî ad ve EBYS başlığı “Millî” (v0.6.0; Kılavuz örnekleri ikisini de kullansa da) |
 
 Son durumda derlemde 6 işaret kaldı; hepsi Kılavuz'un "sık yanlış yazılan kelimeler" tablosundaki gerçek yanlışlar
 (`Ünüverste`, `Ünversite`). Maliyet: 9 bin kelimede ~17 ms (kelime başına sonuçlar saklanır).
@@ -206,6 +206,40 @@ Son durumda derlemde 6 işaret kaldı; hepsi Kılavuz'un "sık yanlış yazılan
 **Bilerek bırakılanlar.** Uzun köklü gerçek kelime hataları (`Eğitim` yerine `Eğitmen`) ve listede olmayan bir adın
 içindeki gerçek kelime hataları yakalanmaz; bunlar başka bir doğru adla ayırt edilemez. Genel istatistik dil modeli,
 eklentinin çevrimdışı ve küçük kalma ilkesiyle uyuşmadığı için kullanılmadı.
+
+## 5e. Arz / rica: editör dışındaki bilgiyle denetim (`kapanis-hiyerarsi.ts`, v0.6.0)
+
+Yönetmelik m.16(12) ve Kılavuz §13.1: alt makama “rica ederim”, **üst ve aynı** düzeye “arz ederim”, birlikte
+dağıtımda “arz ve rica ederim” / “arz/rica ederim”. Doğru ibare metinden değil, **kimin kime yazdığından**
+çıkar; bu bilgi EBYS'de editörün dışındadır:
+
+| Bilgi | Kaynak (Belgenet) |
+|---|---|
+| Gönderen idare / birim | `#kurumHeaderSatir2`, `#kurumHeaderSatir3` (inplace başlık) |
+| Gereği / Bilgi seçimleri | `[id$=":geregiLov:LovSecilenTable_data"] > tr`, `:bilgiLov:` |
+| Dağıtım önizlemesi, hitap | `.geregiTable`, `.bilgiTable`, `.hitap` |
+| Yedek: editöre elle yazılmış başlık/muhatap | "T.C." sonrası iki satır; büyük harfli yönelme ekli satır; "Dağıtım:" listesi |
+
+İçerik betiği bunları `DocMeta` olarak toplar (`content/doc-meta.ts`) ve çekirdeğe düz metin olarak verir; çekirdek
+DOM'u bilmeden test edilir. Okuma editörün kendi formuyla sınırlıdır (birden çok evrak penceresi). Kullanıcı Bilgileri
+sekmesinde seçim yapınca editör metni değişmez; bekçi (1 sn) bilgiyi yeniden okur, değiştiyse denetimi tazeler.
+
+**Düzey** adlardan çıkarılır (`hiyerarsi.ts`): 1 Cumhurbaşkanlığı/TBMM · 2 Bakanlık, Genel Müdürlük · 3 Valilik, il
+birimleri · 4 Kaymakamlık, ilçe birimleri · 5 okul/kurum, muhtarlık. Parantezli muhatapta birinci satır esastır
+(m.16(12)(c)). Gönderende birim satırı bir okulsa düzey odur: okulun yazısında Kaymakamlık üst makamdır.
+
+| Karar | Neden |
+|---|---|
+| Üst/aynı düzeye “rica” → **hata** (tüm muhatapların düzeyi biliniyorsa) | Kullanıcının asıl istediği; kural metinde açık |
+| Düzeyi bilinmeyen muhatap (üniversite, belediye, tüzel kişi) karara katılmaz | Kılavuz: ast-üst net değilse “arz” uygundur, kamu niteliği olmayan tüzel kişiye “rica”. Ad bunu ayırmaya yetmez |
+| Bilinmeyen muhatap varken üst makama “rica” → **uyarı**, iki öneri (arz / arz ve rica) | Bilinmeyen alt makamsa doğru kalıp karmadır |
+| Alt makama “arz”, karma dağıtımda tek ibare → **uyarı** | Sınıflandırma sezgidir; asıl risk üst makama “rica”dır |
+| Öneri Kılavuz §13.1 tablosundaki kalıpla | “Gereğini rica” → “Gereğini bilgilerinize arz”, “Bilgilerinize arz” → “Bilgilerini rica” |
+| Hiçbiri “Tümünü düzelt”e girmez | Muhatap bilgisi yanlış okunmuşsa toplu düzeltme yanlış ibareyi yayar |
+
+**Doğrulanması gereken:** seçili Gereği/Bilgi satırlarının ve dağıtım önizlemesinin gerçek iç yapısı (örnek
+sayfalarda tablolar boştu). Okuyucu satır metninin tamamını alır ve yol biçimli metinde son parçayı kullanır; yapı
+farklıysa `doc-meta.ts` dışında değişiklik gerekmez.
 
 ## 6. CKEditor 4 entegrasyonunda öğrendiklerimiz
 
@@ -226,6 +260,8 @@ eklentinin çevrimdışı ve küçük kalma ilkesiyle uyuşmadığı için kulla
 | `yazim.yaygin` | Sık yanlışlar + **Kılavuz s.54 tablosunun tamamı** (birim testi her satırı doğrular) + §13.6.1 ayrı yazılanlar (`önyargı`, `yanısıra`, `olağandışı`) | hata / uyarı | `bir takım`, `bu gün`, `göz altı`, `direk`, `içtüzük`, `anadili` yalnızca uyarı |
 | `yazim.kurum` | Kurum adında sözlük dışı kelime: `Müdürlügüne`, `MİLLİ EĞTİM`, `Bakanlğımıza` (bkz. 5d) | hata | Öbekte kurum başı yoksa; 4 harften kısa; `/` komşusu |
 | `yazim.kurum.anlam` | Kurum adında gerçek kelime hatası: `Banlığı`, `Mili Eğitim`, `Kaymaklığına` | uyarı | Bkz. 5d kalkan tablosu |
+| `yazim.kurum.nispet` | Kurum adında düzeltme işareti: `Milli Eğitim` → `Millî Eğitim`, `Hakimler` → `Hâkimler` | öneri | Kurum adı öbeği dışında (cins ad: `kilavuz.nispet`) |
+| `kapanis.hiyerarsi` | Gönderen ve Gereği/Bilgi düzeyine göre arz / rica (bkz. 5e) | hata / uyarı | Gönderen ya da muhatap düzeyi bilinmiyorsa |
 | `yazim.birlesik-fiil` | `arzederim` → `arz ederim` | hata | Ses olaylılar |
 | `yazim.birlesik-fiil-bitisik` | `kayıt edildi` → `kaydedildi`, `red etmek` → `reddetmek` | hata | — |
 | `kesme.sayi` | `2026da`, `3'de` → `3'te`, `11.00'da` → `11.00'de` | hata | `2B`, `210x297`; saatte sıfır grubu okunmaz |

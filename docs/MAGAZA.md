@@ -30,6 +30,7 @@ NELERİ DENETLER?
 • Dil bilgisi: ayrı yazılan de/da, ki, mi (banada → bana da); özel adlara ve sayılara gelen ekler (Ahmetin → Ahmet’in, 3de → 3’te); birleşik fiiller (arzederim → arz ederim).
 • Resmî Yazışma Yönetmeliği: Konu, Sayı, İlgi ve Ek biçimi; tutarların yazımı, kısaltma, kapanış ifadesi, süreli yazı ibaresi, imza, paragraflar arasında boş satır.
 • Kurum adları: büyük harfle yazıldığı için genel denetimden kaçan yanlışlar (Milli Eğitim Banlığı → Bakanlığı, Müdürlügüne → Müdürlüğüne, MİLLİ EĞTİM → EĞİTİM).
+• Arz / rica: Gereği ya da Bilgi’de üst veya aynı düzeyde bir makam (Valilik, Bakanlık…) seçiliyse “rica ederim” uyarılır; karma dağıtımda “arz ve rica ederim” önerilir.
 • Konu alanı: Evrak Bilgileri’ndeki Konu satırı da denetlenir (kelimelerin baş harfi büyük, sonda nokta yok, hk. → Hakkında).
 • Resmî Yazışma Kuralları Kılavuzu: kesme işareti, virgül, kısaltma ekleri, sayılar, büyük harf, düzeltme işareti, anlatım bozuklukları, kişisel anlatım, muhatap yazımı ve “sık yanlış kullanılan kelimeler” tablosunun tamamı.
 
@@ -81,7 +82,7 @@ EBYS evrak editöründe yazılan resmî yazıları Türkçe yazım, noktalama ve
 adresler için gerekçe sorarsa:
 
 ```
-İçerik betiği yalnızca MEB EBYS (https://ebys.meb.gov.tr/*) ve eklentinin deneme sayfasında (https://biyonik.github.io/ebys-yazim-denetimi/*) çalışır. Bu sayfalardaki CKEditor evrak editörünün metnini tarayıcı içinde denetleyip hataları işaretlemek için gereklidir. Metin hiçbir yere gönderilmez; eklentinin ağ erişimi yoktur.
+İçerik betiği yalnızca MEB EBYS (https://ebys.meb.gov.tr/*) ve eklentinin deneme sayfasında (https://biyonik.github.io/ebys-yazim-denetimi/*) çalışır. Bu sayfalardaki CKEditor evrak editörünün metnini ve Konu alanını tarayıcı içinde denetleyip hataları işaretlemek için gereklidir; metin sonundaki “arz / rica” seçimi için evrak başlığındaki gönderen idare ile Gereği/Bilgi muhataplarının adları da aynı sayfadan okunur. Hiçbiri hiçbir yere gönderilmez; eklentinin ağ erişimi yoktur.
 ```
 
 **Uzak kod kullanıyor musunuz?** Hayır, uzak kod kullanmıyorum.
@@ -116,7 +117,8 @@ https://biyonik.github.io/ebys-yazim-denetimi/demo/
 2. Click the citation at the bottom right of the bubble (e.g. "Kılavuz §13.6.3"): the bundled PDF opens in a new tab at the cited page.
 3. Click the badge at the bottom right of the editor, then "Tümünü düzelt" (Fix all).
 4. Click the badge to the right of the "Konu" (subject) field above the editor; apply a suggestion or "Tümünü düzelt".
-5. Click the toolbar icon to see the popup.
+5. The last line "Gereğini rica ederim" is flagged because a higher authority is selected in "Gereği" (recipient). Switch the selection to the school: the warning disappears.
+6. Click the toolbar icon to see the popup.
 
 The extension requests no permissions, makes no network requests and collects no data. Source code: https://github.com/biyonik/ebys-yazim-denetimi
 ```

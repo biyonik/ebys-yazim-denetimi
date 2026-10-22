@@ -1,5 +1,18 @@
 # Sürüm notları
 
+## v0.6.0 — 22.10.2026
+
+- **Arz / rica denetimi, seçilen muhataba göre.** Eklenti evrakın başlığındaki gönderen idareyi
+  (“KARESİ KAYMAKAMLIĞI / İlçe Millî Eğitim Müdürlüğü”) ve Gereği/Bilgi alanlarında seçilen muhatapları
+  okur. Üst ya da aynı düzeydeki bir makama (Valilik, Bakanlık, başka bir Kaymakamlık) “… rica ederim”
+  yazılmışsa **hata** verir ve Kılavuz §13.1 kalıbını önerir (“Gereğini bilgilerinize arz ederim”). Karma
+  dağıtımda “arz ve rica ederim”, yalnız alt makamlara (okullar) “rica ederim” beklenir. Seçim değişince
+  editöre dokunmadan karar güncellenir. Başlık ve muhatap editöre elle yazılmışsa metinden okunur.
+  Dayanak: Yönetmelik m.16(12), Kılavuz §13.1.
+- **Millî.** Kurum adında düzeltme işaretsiz yazım (“Milli Eğitim”, “MİLLİ EĞİTİM”, “Hakimler ve Savcılar
+  Kurulu”) öneri olarak bildirilir; resmî ad “Millî Eğitim”dir. “Tümünü düzelt” uygular.
+- Gizlilik metni güncellendi: Konu alanı, gönderen idare ve muhatap adları da yalnızca tarayıcıda işlenir.
+
 ## v0.5.1 — 22.10.2026
 
 - **Kurum adlarında yazım denetimi** (`yazim.kurum`). Genel sözlük kuralı büyük harfle başlayan kelimeyi özel ad

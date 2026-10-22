@@ -908,7 +908,7 @@ const nispet: Rule = {
         out.push(mk(text, 'kilavuz.nispet', t.start, t.end, 'Gazetenin adı “Resmî Gazete” biçiminde yazılır.', 'oneri', 'yazim', K('13.6.8'), ['Resmî']));
         continue;
       }
-      if (isCap(t.text) && !atStart) continue; // "Milli Eğitim Bakanlığı": kurumun tescilli adı
+      if (isCap(t.text) && !atStart) continue; // "Milli Eğitim Bakanlığı": kurum adı, kurum-adi.ts denetler
       const nl = trLower(n.text);
       if (!isLowerLetter(n.text[0]!) || FUNCTION_WORD.has(nl) || FINITE.test(nl) || /['’]/.test(n.text)) continue;
       // "Atatürk'ün resmi", "Türk askeri", "İslam dini": iyelik okuması

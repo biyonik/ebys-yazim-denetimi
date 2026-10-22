@@ -12,8 +12,9 @@
  * bilinen bir kelimeye ÇOK yakın, ama ondan FARKLI bir yazım gerektirir. Eksik bir ad yalnızca o adın
  * yazım hatalarının yakalanmamasına yol açar.
  *
- * Yazım: Kılavuz'un başlık ve muhatap örneklerinde "Millî" ve "Milli" birlikte geçer;
- * eşleşme düzeltme işaretini (â, î, û) yok sayar, ikisi de doğru kabul edilir.
+ * Yazım: resmî ad düzeltme işaretlidir ("Millî Eğitim", "Hâkimler ve Savcılar Kurulu"); EBYS'nin
+ * kurum başlığı da bu biçimdedir. Eşleşme işareti yok sayar (Milli ≈ Millî), işaretsiz yazım ayrıca
+ * öneri olarak bildirilir (kurum-adi.ts, 4. sınıf).
  *
  * Unvanlar ("Daire Başkanı", "Genel Müdür Yardımcısı") da listededir: imza bloğunda ve muhatapta
 kurum adıyla aynı öbekte geçerler.

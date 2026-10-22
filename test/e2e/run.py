@@ -417,6 +417,48 @@ def main():
             ok("Müdürlüğüne" in get_data(page), "Tümünü düzelt Türkçe karakteri düzeltti")
             page.keyboard.press("Escape")
 
+            print("12c) Arz / rica: Gereği'nde seçilen makama göre")
+            page.evaluate("""() => {
+                document.querySelector('#kurumHeaderSatir2 .ui-inplace-display').textContent = 'KARESİ KAYMAKAMLIĞI';
+                document.querySelector('#kurumHeaderSatir3 .ui-inplace-display').textContent = 'İlçe Millî Eğitim Müdürlüğü';
+                const tb = document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data');
+                tb.innerHTML = '<tr class="ui-widget-content"><td>Balıkesir Valiliği (İl Millî Eğitim Müdürlüğü)</td></tr>';
+            }""")
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, "<p>Eğitim programı ekte sunulmuştur.</p><p>Gereğini rica ederim.</p>"])
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');
+                           return h && [...h].some(r => r.toString() === 'Gereğini rica'); }""",
+                timeout=5000,
+            )
+            fr = [x for x in page.frames if x != page.main_frame][0]
+            ok("Gereğini rica" in highlights(fr)["hata"], "üst makam (Valilik) seçili: “rica ederim” hata")
+            click_word(page, fr, "rica")
+            wait_pop(page)
+            pop = page.locator("ebys-yazim-ui .pop").inner_text()
+            ok("Balıkesir Valiliği" in pop and "arz" in pop, f"balonda muhatap ve öneri: {pop[:140]!r}")
+            page.locator("ebys-yazim-ui .pop .sug").first.click()
+            page.wait_for_timeout(300)
+            ok("Gereğini bilgilerinize arz ederim" in get_data(page), "öneri uygulandı: Gereğini bilgilerinize arz ederim")
+            # Seçim alt makama (okul) değişince: editöre dokunmadan karar değişir
+            page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, "<p>Eğitim programı ekte sunulmuştur.</p><p>Gereğini rica ederim.</p>"])
+            page.wait_for_timeout(600)
+            page.evaluate("""() => { document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data')
+                .innerHTML = '<tr class="ui-widget-content"><td>Atatürk Ortaokulu Müdürlüğü</td></tr>'; }""")
+            page.wait_for_function(
+                """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
+                           const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');
+                           return !h || ![...h].some(r => r.toString() === 'Gereğini rica'); }""",
+                timeout=4000,
+            )
+            ok(True, "Gereği alt makama (okul) değişince uyarı kendiliğinden kalktı")
+            page.evaluate("""() => {
+                document.querySelector('#kurumHeaderSatir2 .ui-inplace-display').textContent = '';
+                document.querySelector('#kurumHeaderSatir3 .ui-inplace-display').textContent = '';
+                document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data').innerHTML = '';
+            }""")
+            page.keyboard.press("Escape")
+
             print("13) Performans: 5 sayfalık belge")
             para = ("İlgi (a) yazınızla Bakanlığımıza iletilen talep incelenmiş olup söz konusu hususta "
                     "gerekli değerlendirmelerin yapılabilmesi için ilgili birimlerin görüşlerine başvurulmuştur. "

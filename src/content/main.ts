@@ -90,6 +90,7 @@ setInterval(() => {
   scan();
   for (const s of sessions.values()) {
     s.ensureAttached(); // belge değiştiyse yeniden bağlanır ve denetler
+    s.refreshMeta(); // Gereği/Bilgi seçimi ya da başlık değiştiyse yeniden denetler
     s.positionBadge();
   }
   konuFields.forEach((k) => k.position());

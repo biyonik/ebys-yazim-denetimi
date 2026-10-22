@@ -27,6 +27,17 @@
       <td><label for="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" class="required columnLabelFixWidth">Konu</label></td>
       <td><textarea id="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" name="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" style="width: 300px; overflow-x: hidden; overflow-wrap: break-word; height: 22px;" class="ui-inputfield ui-inputtextarea ui-widget ui-state-default ui-corner-all required metadataKonuTextArea ui-inputtextarea-resizable" cols="20" rows="1" maxlength="500" onchange="window.__konuChange = (window.__konuChange || 0) + 1" role="textbox" aria-required="true"></textarea></td>
     </tr></table>
+    <!-- Belgenet "Bilgileri" sekmesindeki Gereği / Bilgi seçim tabloları (seçilenler satır olarak eklenir) -->
+    <div class="secimler">
+      <div id="yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable" class="ui-datatable ui-widget lov-table"><table role="presentation"><tbody id="yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data" class="ui-datatable-data ui-widget-content"><tr class="ui-widget-content ui-datatable-empty-message"><td colspan="1"></td></tr></tbody></table></div>
+      <div id="yeniGidenEvrakForm:evrakBilgileriList:18:bilgiLov:LovSecilenTable" class="ui-datatable ui-widget lov-table"><table role="presentation"><tbody id="yeniGidenEvrakForm:evrakBilgileriList:18:bilgiLov:LovSecilenTable_data" class="ui-datatable-data ui-widget-content"><tr class="ui-widget-content ui-datatable-empty-message"><td colspan="1"></td></tr></tbody></table></div>
+    </div>
+    <!-- Editörün üstündeki kurum başlığı (inplace alanlar); testler doldurur -->
+    <div class="firstPageHeader"><table><tbody>
+      <tr><td id="kurumHeaderSatir1"><span class="ui-inplace-display">T.C.</span></td></tr>
+      <tr><td id="kurumHeaderSatir2"><span class="ui-inplace-display"></span></td></tr>
+      <tr><td id="kurumHeaderSatir3"><span class="ui-inplace-display"></span></td></tr>
+    </tbody></table></div>
     <table class="layout"><tr>
       <td class="ui-edys-editor">
         <textarea id="yeniGidenEvrakForm:ckeditorInstance_window1" name="yeniGidenEvrakForm:ckeditorInstance_window1"><p style="text-align:center"><strong>T.C.</strong><br><strong>ÖRNEK KURUM BAŞKANLIĞI</strong></p>

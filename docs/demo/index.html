@@ -31,6 +31,10 @@
   code { background: #f1f3f4; padding: 1px 5px; border-radius: 4px; font-size: 13.5px; }
   table.layout { width: 100%; background: #fff; border: 1px solid var(--line); border-collapse: collapse; }
   td.ui-edys-editor { padding: 0; }
+  .ebys-baslik { background: #fff; border: 1px solid var(--line); border-bottom: 0; padding: 10px 12px 2px; text-align: center; font-family: "Times New Roman", serif; font-size: 15px; line-height: 1.35; }
+  .ebys-baslik td { text-align: center; }
+  .bilgiler + .bilgiler { border-top: 0; padding-top: 0; }
+  .bilgiler select { font: 14px Arial, sans-serif; padding: 3px 4px; }
   .bilgiler { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-bottom: 0; padding: 10px 12px; }
   .bilgiler label { font-weight: 600; font-size: 14px; }
   .bilgiler textarea { width: 360px; height: 28px; font: 14px/1.4 Arial, sans-serif; padding: 4px 6px; resize: none; border: 1px solid #c4c7cc; border-radius: 3px; }
@@ -59,6 +63,7 @@
       <li>Balonun sağ altındaki <code>Kılavuz §…</code> atfına tıklayın: Kılavuz ilgili sayfasında açılır.</li>
       <li>Editörün sağ altındaki rozete tıklayıp <b>Tümünü düzelt</b>’e basın; <b>Ctrl+Z</b> hepsini tek adımda geri alır.</li>
       <li>Kurum adlarına bakın: <code>Müdürlügüne</code> (hata) ve <code>Banlığına</code> (sözlükte var ama yanlış, turuncu).</li>
+      <li>Son satırdaki <code>Gereğini rica ederim</code>: Gereği’nde üst makam (Valilik) seçili olduğu için hata. Seçimi okula çevirin, uyarı kalkar.</li>
       <li><b>Konu</b> alanı da denetlenir: sağındaki sayaca tıklayın. EBYS’de olduğu gibi Sayı, Konu ve İlgi editörde değil, ayrı alanlardadır.</li>
       <li>Kendi metninizi yazın ya da yapıştırın. Metin bu sayfadan hiçbir yere gönderilmez.</li>
     </ol>
@@ -68,6 +73,21 @@
       <label for="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea">Konu</label>
       <textarea id="yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea" class="metadataKonuTextArea" rows="1" maxlength="500"></textarea>
     </div>
+    <div class="bilgiler">
+      <label for="gereki">Gereği</label>
+      <select id="gereki">
+        <option value="Balıkesir Valiliği (İl Millî Eğitim Müdürlüğü)">Balıkesir Valiliği (üst makam)</option>
+        <option value="Atatürk Ortaokulu Müdürlüğü">Atatürk Ortaokulu (alt makam)</option>
+      </select>
+      <!-- EBYS'deki Gereği seçim tablosunun kopyası: eklenti seçilen muhatabı buradan okur -->
+      <table hidden><tbody id="yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data"></tbody></table>
+    </div>
+    <!-- EBYS'nin editör üstündeki kurum başlığı: gönderen idare -->
+    <table class="ebys-baslik" style="width:100%"><tbody>
+      <tr><td id="kurumHeaderSatir1"><span class="ui-inplace-display">T.C.</span></td></tr>
+      <tr><td id="kurumHeaderSatir2"><span class="ui-inplace-display">ÖRNEK KAYMAKAMLIĞI</span></td></tr>
+      <tr><td id="kurumHeaderSatir3"><span class="ui-inplace-display">İlçe Millî Eğitim Müdürlüğü</span></td></tr>
+    </tbody></table>
     <table class="layout"><tr><td class="ui-edys-editor">
       <textarea id="yeniGidenEvrakForm:ckeditorInstance_window1" name="yeniGidenEvrakForm:ckeditorInstance_window1"></textarea>
     </td></tr></table>
@@ -83,13 +103,12 @@
 </footer>
 <script>
   var ORNEK =
-    '<p style="text-align:center"><strong>T.C.</strong><br><strong>ÖRNEK KURUM BAŞKANLIĞI</strong></p>' +
     '<p>İlgi yazınızla talep edilen eğitim programı Başkanlığımız’da hazırlanmış olup programın 2026da ' +
     'başlaması planlanmaktadır. Eğitime yanlız birim amirleri katılacak, diğer personel banada bildirilen ' +
     'listeye göre 2\'şer kişilik gruplar hâlinde katılacaktır. Diğer birimler hala bilgilendirilmedi.</p>' +
-    '<p>Program sonuçları İlçe Milli Eğitim Müdürlügüne ve Milli Eğitim Banlığına bildirilecektir.</p>' +
+    '<p>Program sonuçları İlçe Millî Eğitim Müdürlügüne ve Milli Eğitim Banlığına bildirilecektir.</p>' +
     '<p>Programın orjinal takvimi hizmet te kullanılacak salonlarla birlikte ekte sunulmuştur.</p>' +
-    '<p>Bilgilerinize arzederim.</p>';
+    '<p>Gereğini rica ederim.</p>';
   var KONU = 'eğitim programı hk.';
   var ED = 'yeniGidenEvrakForm:ckeditorInstance_window1';
   var konu = document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:3:konuTextArea');
@@ -100,6 +119,15 @@
     extraAllowedContent: '*(*);*{*}', removeButtons: 'About',
   });
   CKEDITOR.addCss('body.evrak { font-family: "Times New Roman", serif; font-size: 12pt; line-height: 150%; margin: 16px 24px; }');
+  var gereki = document.getElementById('gereki');
+  var secilen = document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data');
+  function gerekiYaz() {
+    secilen.innerHTML = '';
+    var tr = document.createElement('tr'), td = document.createElement('td');
+    td.textContent = gereki.value; tr.appendChild(td); secilen.appendChild(tr);
+  }
+  gereki.onchange = gerekiYaz;
+  gerekiYaz();
   document.getElementById('sifirla').onclick = function () {
     CKEDITOR.instances[ED].setData(ORNEK);
     konu.value = KONU;

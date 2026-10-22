@@ -40,9 +40,26 @@ export interface Token {
   end: number;
 }
 
+/** Muhatap: EBYS'de "Gereği" / "Bilgi" alanında seçilen ya da hitap satırında görünen idare/birim */
+export interface Recipient {
+  text: string;
+  role: 'gereği' | 'bilgi' | 'muhatap';
+}
+
+/**
+ * Editörün DIŞINDAKİ belge bilgisi: EBYS sayfasının başlığından ve dağıtım alanlarından okunur
+ * (content/doc-meta.ts). Çekirdek DOM'u bilmez; yalnızca bu düz metinleri alır.
+ */
+export interface DocMeta {
+  /** Başlık satırları, T.C.'den sonra: ["KARESİ KAYMAKAMLIĞI", "İlçe Millî Eğitim Müdürlüğü"] */
+  sender?: string[];
+  recipients?: Recipient[];
+}
+
 export interface RuleContext {
   text: string;
   tokens: Token[];
+  meta?: DocMeta;
 }
 
 export interface Rule {
