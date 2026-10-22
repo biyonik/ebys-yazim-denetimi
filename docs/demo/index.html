@@ -63,7 +63,7 @@
       <li>Balonun sağ altındaki <code>Kılavuz §…</code> atfına tıklayın: Kılavuz ilgili sayfasında açılır.</li>
       <li>Editörün sağ altındaki rozete tıklayıp <b>Tümünü düzelt</b>’e basın; <b>Ctrl+Z</b> hepsini tek adımda geri alır.</li>
       <li>Kurum adlarına bakın: <code>Müdürlügüne</code> (hata) ve <code>Banlığına</code> (sözlükte var ama yanlış, turuncu).</li>
-      <li>Son satırdaki <code>Gereğini rica ederim</code>: Gereği’nde üst makam (Valilik) seçili olduğu için hata. Seçimi okula çevirin, uyarı kalkar.</li>
+      <li>Son satırdaki <code>Gereğini rica ederim</code>: Gereği’nde üst makam (İl Millî Eğitim Müdürlüğü) seçili olduğu için hata. Seçimi anaokuluna çevirin, uyarı kalkar.</li>
       <li><b>Konu</b> alanı da denetlenir: sağındaki sayaca tıklayın. EBYS’de olduğu gibi Sayı, Konu ve İlgi editörde değil, ayrı alanlardadır.</li>
       <li>Kendi metninizi yazın ya da yapıştırın. Metin bu sayfadan hiçbir yere gönderilmez.</li>
     </ol>
@@ -76,8 +76,8 @@
     <div class="bilgiler">
       <label for="gereki">Gereği</label>
       <select id="gereki">
-        <option value="Balıkesir Valiliği (İl Millî Eğitim Müdürlüğü)">Balıkesir Valiliği (üst makam)</option>
-        <option value="Atatürk Ortaokulu Müdürlüğü">Atatürk Ortaokulu (alt makam)</option>
+        <option value="v">Örnek İl Millî Eğitim Müdürlüğü (üst makam)</option>
+        <option value="o">Örnek Anaokulu Müdürlüğü (alt makam)</option>
       </select>
       <!-- EBYS'deki Gereği seçim tablosunun kopyası: eklenti seçilen muhatabı buradan okur -->
       <table hidden><tbody id="yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data"></tbody></table>
@@ -121,10 +121,19 @@
   CKEDITOR.addCss('body.evrak { font-family: "Times New Roman", serif; font-size: 12pt; line-height: 150%; margin: 16px 24px; }');
   var gereki = document.getElementById('gereki');
   var secilen = document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data');
+  // EBYS'deki seçim satırının yapısı: başlık + DETSİS yolu (eklenti düzeyi yoldan çıkarır)
+  var SECENEK = {
+    v: ['Örnek İl Millî Eğitim Müdürlüğüne', 'TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Örnek Valiliği,Örnek İl Millî Eğitim Müdürlüğü'],
+    o: ['Örnek Anaokulu Müdürlüğüne', 'TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Örnek Valiliği,Örnek Kaymakamlığı,Örnek İlçe Millî Eğitim Müdürlüğü,Örnek Anaokulu Müdürlüğü'],
+  };
   function gerekiYaz() {
+    var s = SECENEK[gereki.value];
     secilen.innerHTML = '';
     var tr = document.createElement('tr'), td = document.createElement('td');
-    td.textContent = gereki.value; tr.appendChild(td); secilen.appendChild(tr);
+    var t = document.createElement('span'), d = document.createElement('span');
+    tr.className = 'lov-table-row'; t.className = 'lovItemTitle'; d.className = 'lovItemDetail';
+    t.textContent = s[0]; d.textContent = s[1];
+    td.appendChild(t); td.appendChild(d); tr.appendChild(td); secilen.appendChild(tr);
   }
   gereki.onchange = gerekiYaz;
   gerekiYaz();

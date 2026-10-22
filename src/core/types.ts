@@ -44,6 +44,12 @@ export interface Token {
 export interface Recipient {
   text: string;
   role: 'gereği' | 'bilgi' | 'muhatap';
+  /**
+   * DETSİS hiyerarşi yolu, kökten birime — EBYS seçim satırının ayrıntısından:
+   * ["TÜRKİYE CUMHURİYETİ", "Taşra Teşkilatı", "Balıkesir Valiliği", "Karesi Kaymakamlığı",
+   *  "Karesi İlçe Milli Eğitim Müdürlüğü", "Karesi Anaokulu Müdürlüğü"]
+   */
+  path?: string[];
 }
 
 /**

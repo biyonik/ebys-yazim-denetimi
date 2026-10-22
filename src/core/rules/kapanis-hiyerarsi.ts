@@ -1,5 +1,5 @@
 import type { Issue, Rule, Severity } from '../types.ts';
-import { idareOf, metaFromText, senderOf, type Idare } from '../hiyerarsi.ts';
+import { metaFromText, recipientIdare, senderOf, type Idare } from '../hiyerarsi.ts';
 import { trLower } from '../turkish.ts';
 
 /**
@@ -68,7 +68,7 @@ export const kapanisHiyerarsi: Rule = {
       const key = trLower(r.text).replace(/\s+/g, ' ').trim();
       if (!key || seen.has(key) || key === 'dağıtım yerlerine') continue;
       seen.add(key);
-      const i = idareOf(r.text);
+      const i = recipientIdare(r);
       if (i) known.push(i);
       else unknown++;
     }

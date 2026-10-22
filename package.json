@@ -1,6 +1,6 @@
 {
   "name": "ebys-yazim",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "EBYS evrak editörü için yerel çalışan Türkçe yazım denetimi (Chrome eklentisi)",
   "scripts": {
     "build": "node build.mjs",

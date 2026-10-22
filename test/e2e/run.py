@@ -422,7 +422,8 @@ def main():
                 document.querySelector('#kurumHeaderSatir2 .ui-inplace-display').textContent = 'KARESİ KAYMAKAMLIĞI';
                 document.querySelector('#kurumHeaderSatir3 .ui-inplace-display').textContent = 'İlçe Millî Eğitim Müdürlüğü';
                 const tb = document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data');
-                tb.innerHTML = '<tr class="ui-widget-content"><td>Balıkesir Valiliği (İl Millî Eğitim Müdürlüğü)</td></tr>';
+                // EBYS'deki gerçek seçim satırı yapısı: başlık + DETSİS yolu
+                tb.innerHTML = '<tr data-ri="0" class="ui-widget-content ui-datatable-even lov-table-row" role="row"><td role="gridcell" class="lov-table-column "><table class="ui-panelgrid ui-widget" role="grid"><tbody><tr class="ui-widget-content ui-panelgrid-even" role="row"><td role="gridcell" class="ui-panelgrid-cell"><button type="button">x</button></td><td role="gridcell" class="ui-panelgrid-cell"><div class="ui-outputpanel ui-widget"> <span><span class="lovItemTitle">Balıkesir İl Milli Eğitim Müdürlüğüne</span><span class="lovItemDetail">TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,Balıkesir İl Milli Eğitim Müdürlüğü</span><span style="margin-left:4px">Otomatik Dağıtım</span> </span></div></td></tr></tbody></table></td></tr>';
             }""")
             page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, "<p>Eğitim programı ekte sunulmuştur.</p><p>Gereğini rica ederim.</p>"])
             page.wait_for_function(
@@ -436,7 +437,7 @@ def main():
             click_word(page, fr, "rica")
             wait_pop(page)
             pop = page.locator("ebys-yazim-ui .pop").inner_text()
-            ok("Balıkesir Valiliği" in pop and "arz" in pop, f"balonda muhatap ve öneri: {pop[:140]!r}")
+            ok("Balıkesir İl Milli Eğitim Müdürlüğü" in pop and "arz" in pop, f"balonda muhatap ve öneri: {pop[:140]!r}")
             page.locator("ebys-yazim-ui .pop .sug").first.click()
             page.wait_for_timeout(300)
             ok("Gereğini bilgilerinize arz ederim" in get_data(page), "öneri uygulandı: Gereğini bilgilerinize arz ederim")
@@ -444,7 +445,7 @@ def main():
             page.evaluate("([ed, h]) => CKEDITOR.instances[ed].setData(h)", [ED, "<p>Eğitim programı ekte sunulmuştur.</p><p>Gereğini rica ederim.</p>"])
             page.wait_for_timeout(600)
             page.evaluate("""() => { document.getElementById('yeniGidenEvrakForm:evrakBilgileriList:19:geregiLov:LovSecilenTable_data')
-                .innerHTML = '<tr class="ui-widget-content"><td>Atatürk Ortaokulu Müdürlüğü</td></tr>'; }""")
+                .innerHTML = '<tr data-ri="0" class="ui-widget-content ui-datatable-even lov-table-row" role="row"><td role="gridcell" class="lov-table-column "><table class="ui-panelgrid ui-widget" role="grid"><tbody><tr class="ui-widget-content ui-panelgrid-even" role="row"><td role="gridcell" class="ui-panelgrid-cell"><button type="button">x</button></td><td role="gridcell" class="ui-panelgrid-cell"><div class="ui-outputpanel ui-widget"> <span><span class="lovItemTitle">Karesi Anaokulu Müdürlüğüne</span><span class="lovItemDetail">TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,Karesi Kaymakamlığı,Karesi İlçe Milli Eğitim Müdürlüğü,Karesi Anaokulu Müdürlüğü</span><span style="margin-left:4px">Otomatik Dağıtım</span> </span></div></td></tr></tbody></table></td></tr>'; }""")
             page.wait_for_function(
                 """() => { const f = document.querySelector('iframe.cke_wysiwyg_frame');
                            const h = f && f.contentWindow.CSS.highlights.get('ebys-yazim-hata');

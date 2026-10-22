@@ -10,7 +10,9 @@ import type { DocMeta, Recipient } from '../core/types.ts';
  *   <td id="kurumHeaderSatir3"> … İlçe Millî Eğitim Müdürlüğü
  *
  * Muhataplar — üç kaynak, hangisi doluysa:
- *   - Bilgileri sekmesindeki seçimler: [id$=":geregiLov:LovSecilenTable_data"] / ":bilgiLov:" satırları
+ *   - Bilgileri sekmesindeki seçimler: [id$=":geregiLov:LovSecilenTable_data"] / ":bilgiLov:" satırları.
+ *     Her satırda <span class="lovItemTitle">Karesi Anaokulu Müdürlüğüne</span> ve
+ *     <span class="lovItemDetail">TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,…</span> (DETSİS yolu)
  *   - Editör sayfasındaki dağıtım önizlemesi: .geregiTable / .bilgiTable
  *   - Hitap satırı: .hitap ("BALIKESİR VALİLİĞİNE" ya da "DAĞITIM YERLERİNE")
  *
@@ -53,7 +55,11 @@ export function readDocMeta(iframe: HTMLIFrameElement): DocMeta {
   };
   for (const [lov, role] of [['geregiLov', 'gereği'], ['bilgiLov', 'bilgi']] as const) {
     for (const tr of all(`[id$=":${lov}:LovSecilenTable_data"] > tr:not(.ui-datatable-empty-message)`)) {
-      add(clean(tr.querySelector('td')?.textContent ?? tr.textContent), role);
+      const title = clean(tr.querySelector('.lovItemTitle')?.textContent);
+      const detail = clean(tr.querySelector('.lovItemDetail')?.textContent);
+      const text = title || clean(tr.textContent);
+      if (!text) continue;
+      recipients.push(detail ? { text, role, path: detail.split(',').map((p) => p.trim()) } : { text, role });
     }
   }
   for (const [cls, role] of [['geregiTable', 'gereği'], ['bilgiTable', 'bilgi']] as const) {
@@ -66,4 +72,4 @@ export function readDocMeta(iframe: HTMLIFrameElement): DocMeta {
 
 /** Değişiklik tespiti için kararlı anahtar */
 export const metaKey = (m: DocMeta): string =>
-  JSON.stringify([m.sender ?? [], (m.recipients ?? []).map((r) => `${r.role}:${r.text}`).sort()]);
+  JSON.stringify([m.sender ?? [], (m.recipients ?? []).map((r) => `${r.role}:${r.text}:${(r.path ?? []).join('>')}`).sort()]);

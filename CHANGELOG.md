@@ -1,5 +1,14 @@
 # Sürüm notları
 
+## v0.6.1 — 22.10.2026
+
+- Arz / rica: Gereği/Bilgi seçim satırları EBYS'nin gerçek yapısıyla okunuyor (başlık + DETSİS hiyerarşi yolu).
+  Düzey artık yoldan çıkarılıyor: “…,Balıkesir Valiliği,Karesi Kaymakamlığı,Karesi İlçe Milli Eğitim
+  Müdürlüğü,Karesi Anaokulu Müdürlüğü” → alt makam. Düzeltildi: v0.6.0 satırın düz metnini okuduğu için
+  yoldaki “Valiliği” bir okulu üst makam sayabiliyordu.
+- Uyarıda muhatabın yalın adı gösteriliyor (“Balıkesir İl Milli Eğitim Müdürlüğü”).
+- Deneme sayfası gerçek satır yapısıyla, kurgusal kurum adlarıyla güncellendi.
+
 ## v0.6.0 — 22.10.2026
 
 - **Arz / rica denetimi, seçilen muhataba göre.** Eklenti evrakın başlığındaki gönderen idareyi

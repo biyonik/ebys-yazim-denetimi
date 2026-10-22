@@ -95,3 +95,18 @@ test('EBYS bilgisi editör metnine göre önceliklidir', () => {
   // EBYS'de Gereği'nde okul seçili: metindeki eski muhatap satırı karar vermez
   assert.deepEqual(closing(t, { sender: KAYM, recipients: [r('Atatürk Ortaokulu Müdürlüğü')] }), []);
 });
+
+test('EBYS seçim satırı: DETSİS yolundan düzey (gerçek satır biçimi)', () => {
+  const yol = (s: string) => s.split(',');
+  const il = { text: 'Balıkesir İl Milli Eğitim Müdürlüğüne', role: 'gereği' as const, path: yol('TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,Balıkesir İl Milli Eğitim Müdürlüğü') };
+  const okul = { text: 'Karesi Anaokulu Müdürlüğüne', role: 'bilgi' as const, path: yol('TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,Karesi Kaymakamlığı,Karesi İlçe Milli Eğitim Müdürlüğü,Karesi Anaokulu Müdürlüğü') };
+  const ilce = { text: 'Altıeylül İlçe Milli Eğitim Müdürlüğüne', role: 'gereği' as const, path: yol('TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,Altıeylül Kaymakamlığı,Altıeylül İlçe Milli Eğitim Müdürlüğü') };
+  assert.deepEqual(closing('Gereğini rica ederim.', { sender: KAYM, recipients: [il] }), [['Gereğini rica', ['Gereğini bilgilerinize arz'], 'hata']]);
+  assert.deepEqual(closing('Gereğini rica ederim.', { sender: KAYM, recipients: [okul] }), []);
+  assert.deepEqual(closing('Gereğini rica ederim.', { sender: KAYM, recipients: [il, okul] }), [['Gereğini rica', ['Gereğini arz ve rica'], 'hata']]);
+  // başka ilçenin MEM'i aynı düzey
+  assert.equal(closing('Gereğini rica ederim.', { sender: KAYM, recipients: [ilce] })[0]?.[2], 'hata');
+  // mesajda birimin yalın adı
+  const [is] = check('Gereğini rica ederim.', { meta: { sender: KAYM, recipients: [il] } }).filter((i) => i.ruleId === 'kapanis.hiyerarsi');
+  assert.match(is!.message, /Balıkesir İl Milli Eğitim Müdürlüğü\)/);
+});

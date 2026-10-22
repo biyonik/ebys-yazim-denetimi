@@ -117,7 +117,7 @@ https://biyonik.github.io/ebys-yazim-denetimi/demo/
 2. Click the citation at the bottom right of the bubble (e.g. "Kılavuz §13.6.3"): the bundled PDF opens in a new tab at the cited page.
 3. Click the badge at the bottom right of the editor, then "Tümünü düzelt" (Fix all).
 4. Click the badge to the right of the "Konu" (subject) field above the editor; apply a suggestion or "Tümünü düzelt".
-5. The last line "Gereğini rica ederim" is flagged because a higher authority is selected in "Gereği" (recipient). Switch the selection to the school: the warning disappears.
+5. The last line "Gereğini rica ederim" is flagged because a higher authority is selected in "Gereği" (recipient). Switch the selection to the kindergarten (lower authority): the warning disappears.
 6. Click the toolbar icon to see the popup.
 
 The extension requests no permissions, makes no network requests and collects no data. Source code: https://github.com/biyonik/ebys-yazim-denetimi

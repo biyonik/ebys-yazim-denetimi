@@ -46,6 +46,50 @@ export function idareOf(raw: string): Idare | undefined {
   return undefined;
 }
 
+/** Yalnızca İDARE adları (birim değil): hiyerarşi yolundaki çapalar */
+const IDARE: Array<[Idare['level'], RegExp]> = [
+  [1, /cumhurbaşkanlığ|türkiye büyük millet meclis/],
+  [2, /bakanlığ/],
+  [3, /valiliğ/],
+  [4, /kaymakamlığ/],
+];
+
+/**
+ * EBYS seçim satırındaki DETSİS yolu ("…,Balıkesir Valiliği,Karesi Kaymakamlığı,Karesi İlçe Milli Eğitim
+ * Müdürlüğü,Karesi Anaokulu Müdürlüğü") addan daha güvenilirdir: birimin hangi idareye, kaç basamak
+ * altta bağlı olduğunu söyler.
+ *   idarenin kendisi ya da doğrudan birimi (İlçe MEM, İl MEM, Genel Müdürlük) → idarenin düzeyi (m.16(12)(c))
+ *   Kaymakamlığın iki basamak altı (okul, halk eğitimi)                         → 5
+ *   Valiliğin iki basamak altı: okul/kurumsa 5, değilse düzeysiz
+ *   Bakanlık ve Cumhurbaşkanlığının alt birimleri                               → idarenin düzeyi
+ */
+export function idareFromPath(path: readonly string[]): Idare | undefined {
+  const segs = path.map((p) => p.trim()).filter(Boolean);
+  if (!segs.length) return undefined;
+  const label = segs.at(-1)!;
+  let k = -1;
+  let level: Idare['level'] | undefined;
+  segs.forEach((s, i) => {
+    const n = fold(trLower(s));
+    for (const [l, re] of IDARE) {
+      if (re.test(n)) {
+        k = i;
+        level = l;
+        break;
+      }
+    }
+  });
+  if (level === undefined) return idareOf(label);
+  const depth = segs.length - 1 - k;
+  if (depth <= 1 || level <= 2) return { level, label };
+  if (level === 4) return { level: 5, label };
+  return idareOf(label)?.level === 5 ? { level: 5, label } : undefined;
+}
+
+export function recipientIdare(r: Recipient): Idare | undefined {
+  return (r.path?.length ? idareFromPath(r.path) : undefined) ?? idareOf(r.text);
+}
+
 /**
  * Gönderenin düzeyi: başlıktaki idare (satır 2). Birim satırı bir okul/kurumsa (satır 3) düzey odur:
  * okul müdürlüğünün yazısında Kaymakamlık üst makamdır; İlçe Millî Eğitim Müdürlüğü ise Kaymakamlık adına yazar.

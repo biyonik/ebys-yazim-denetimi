@@ -216,7 +216,7 @@ dağıtımda “arz ve rica ederim” / “arz/rica ederim”. Doğru ibare meti
 | Bilgi | Kaynak (Belgenet) |
 |---|---|
 | Gönderen idare / birim | `#kurumHeaderSatir2`, `#kurumHeaderSatir3` (inplace başlık) |
-| Gereği / Bilgi seçimleri | `[id$=":geregiLov:LovSecilenTable_data"] > tr`, `:bilgiLov:` |
+| Gereği / Bilgi seçimleri | `[id$=":geregiLov:LovSecilenTable_data"] > tr`, `:bilgiLov:`; satırda `.lovItemTitle` (“Karesi Anaokulu Müdürlüğüne”) ve `.lovItemDetail` (DETSİS yolu: “TÜRKİYE CUMHURİYETİ,Taşra Teşkilatı,Balıkesir Valiliği,Karesi Kaymakamlığı,Karesi İlçe Milli Eğitim Müdürlüğü,Karesi Anaokulu Müdürlüğü”) |
 | Dağıtım önizlemesi, hitap | `.geregiTable`, `.bilgiTable`, `.hitap` |
 | Yedek: editöre elle yazılmış başlık/muhatap | "T.C." sonrası iki satır; büyük harfli yönelme ekli satır; "Dağıtım:" listesi |
 
@@ -224,7 +224,9 @@ dağıtımda “arz ve rica ederim” / “arz/rica ederim”. Doğru ibare meti
 DOM'u bilmeden test edilir. Okuma editörün kendi formuyla sınırlıdır (birden çok evrak penceresi). Kullanıcı Bilgileri
 sekmesinde seçim yapınca editör metni değişmez; bekçi (1 sn) bilgiyi yeniden okur, değiştiyse denetimi tazeler.
 
-**Düzey** adlardan çıkarılır (`hiyerarsi.ts`): 1 Cumhurbaşkanlığı/TBMM · 2 Bakanlık, Genel Müdürlük · 3 Valilik, il
+**Düzey** önce seçim satırındaki DETSİS yolundan çıkarılır: yoldaki son idare (Cumhurbaşkanlığı, Bakanlık, Valilik,
+Kaymakamlık) çapadır; idarenin kendisi ya da doğrudan birimi idarenin düzeyini alır, Kaymakamlığın iki basamak altı
+(okul, kurum) 5'tir. Yol yoksa (hitap, editöre yazılmış muhatap) adlardan çıkarılır (`hiyerarsi.ts`): 1 Cumhurbaşkanlığı/TBMM · 2 Bakanlık, Genel Müdürlük · 3 Valilik, il
 birimleri · 4 Kaymakamlık, ilçe birimleri · 5 okul/kurum, muhtarlık. Parantezli muhatapta birinci satır esastır
 (m.16(12)(c)). Gönderende birim satırı bir okulsa düzey odur: okulun yazısında Kaymakamlık üst makamdır.
 
@@ -237,9 +239,10 @@ birimleri · 4 Kaymakamlık, ilçe birimleri · 5 okul/kurum, muhtarlık. Parant
 | Öneri Kılavuz §13.1 tablosundaki kalıpla | “Gereğini rica” → “Gereğini bilgilerinize arz”, “Bilgilerinize arz” → “Bilgilerini rica” |
 | Hiçbiri “Tümünü düzelt”e girmez | Muhatap bilgisi yanlış okunmuşsa toplu düzeltme yanlış ibareyi yayar |
 
-**Doğrulanması gereken:** seçili Gereği/Bilgi satırlarının ve dağıtım önizlemesinin gerçek iç yapısı (örnek
-sayfalarda tablolar boştu). Okuyucu satır metninin tamamını alır ve yol biçimli metinde son parçayı kullanır; yapı
-farklıysa `doc-meta.ts` dışında değişiklik gerekmez.
+**Doğrulandı (v0.6.1):** seçili Gereği/Bilgi satırlarının yapısı gerçek sayfadan alındı (başlık + DETSİS yolu).
+İlk sürüm satırın düz metnini okuyordu; yol metne yapıştığı için anaokulu satırındaki “Balıkesir Valiliği” düzeyi
+3'e çekiyordu — gerçek örnek olmadan bulunamayacak bir hataydı. Dağıtım önizlemesinin (`.geregiTable`) dolu hâli
+henüz görülmedi; seçim tabloları dolu olduğu sürece karar onlardan verilir.
 
 ## 6. CKEditor 4 entegrasyonunda öğrendiklerimiz
 
