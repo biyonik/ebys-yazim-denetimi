@@ -1071,9 +1071,8 @@ const belge: Rule = {
     const tekit = /(?<![\p{L}])[Tt]eki[td]\p{Ll}*/u.exec(text);
     if (tekit) {
       const ref = `${Y('34')}, ${K('30')}`;
-      if (!/(?:^|\n)\s*İlgi\s*:/.test(text)) {
-        out.push(mk(text, 'kilavuz.tekit.ilgi', tekit.index, tekit.index + tekit[0].length, 'Tekit yazısında daha önce gönderilen yazının ilgi tutulması zorunludur.', 'uyari', 'bicim', ref));
-      }
+      // "Tekitte ilgi tutulmalı" denetlenmez: EBYS'de İlgi, Sayı ve Konu editörde değil ayrı form
+      // alanlarındadır. Editör metninde "İlgi:" satırının olmaması bir şey kanıtlamaz; uyarı yanlış alarm olurdu.
       const arz = /(?<![\p{L}])[Aa]rz ederim/u.exec(text);
       if (arz && !/rica ederim/i.test(text)) {
         out.push(mk(text, 'kilavuz.tekit.duzey', arz.index, arz.index + arz[0].length, 'Kılavuz: tekit yazıları amacı itibarıyla alt idarelere yazılır, üst seviyedeki kurumlara yazılmaz. “Arz ederim” üst ya da aynı düzeye işaret eder; muhatap üst düzeydeyse tekit yerine yeni bir talep yazısı düşünün. (Şubat 2025 baskısı aynı düzeyi açıkça sayar.)', 'oneri', 'bicim', ref));

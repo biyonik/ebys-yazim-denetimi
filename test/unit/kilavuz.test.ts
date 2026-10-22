@@ -214,7 +214,8 @@ test('§15 ek, §23 süreli yazı, §30 tekit, §14.2 imza', () => {
   assert.equal(only('ACELE\nGörüşlerin en geç 15.10.2026 tarihine kadar bildirilmesi gerekmektedir.', 'kilavuz.sureli.sure').length, 1);
   assert.equal(only('ACELE\nOLUR\nTalep uygun görülmüştür.', 'kilavuz.sureli.olur').length, 1);
 
-  assert.equal(only('Daha önce istenen bilgilerin tekiden gönderilmesini rica ederim.', 'kilavuz.tekit.ilgi').length, 1);
+  // EBYS'de İlgi ayrı alanda: editör metninde "İlgi:" olmaması uyarı sebebi değildir
+  assert.deepEqual(only('Daha önce istenen bilgilerin tekiden gönderilmesini rica ederim.', 'kilavuz.tekit'), []);
   assert.deepEqual(only('İlgi: 01.09.2019 tarihli ve E-1-2-3 sayılı yazımız.\nBilgilerin tekiden gönderilmesini rica ederim.', 'kilavuz.tekit'), []);
   assert.equal(only('İlgi: 01.09.2019 tarihli ve E-1-2-3 sayılı yazımız.\nKonunun tekidini arz ederim.', 'kilavuz.tekit.duzey').length, 1);
 

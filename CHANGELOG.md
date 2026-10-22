@@ -1,5 +1,11 @@
 # Sürüm notları
 
+## v0.4.2 — 22.10.2026
+
+- Yanlış alarm giderildi: metinde “tekit” geçtiğinde “ilgi tutulmalı” uyarısı verilmiyor. MEB EBYS’de
+  İlgi, Sayı ve Konu editörde değil ayrı form alanlarındadır; editör metninde “İlgi:” satırının olmaması
+  bir eksiklik göstermez.
+
 ## v0.4.1 — 18.10.2026
 
 - **Deneme sayfası:** https://biyonik.github.io/ebys-yazim-denetimi/demo/ — EBYS’ye girmeden denemek ve mağaza

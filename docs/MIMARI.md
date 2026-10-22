@@ -235,7 +235,7 @@ Arka plan mesajı yalnızca `{belge, sayfa}` taşır, belge adı beyaz listeden,
 | `kilavuz.muhatap.*` | 11.4 | Muhatap üstünde T.C.; yönelme eki parantezdeki birimde; parantezde birim zinciri; gerçek kişiye yönelme eki | hata / uyarı |
 | `kilavuz.ek.sayi` | 15 | Ek maddesinde sayısal bilgi yok ("(2 Sayfa)", "(1 Adet)") | öneri |
 | `kilavuz.sureli.*` | 23 | GÜNLÜDÜR'de süre yok; ACELE'de cevap süresi var; Olur belgesinde ibare | uyarı |
-| `kilavuz.tekit.*` | 30 | Tekitte ilgi yok; "arz ederim" ile biten tekit | uyarı / öneri |
+| `kilavuz.tekit.duzey` | 30 | "arz ederim" ile biten tekit (ilgi zorunluluğu denetlenmez: EBYS'de İlgi ayrı form alanında) | öneri |
 | `kilavuz.imza.ad` | 14.2, 11.3 | "Mehmet A. YILMAZ" | uyarı |
 | `kilavuz.paragraf.bosluk` | m.16(4), 31 | İki metin paragrafı arasında boş satır (başlık, muhatap, imza, e-imza notu çevresi hariç) | uyarı |
 
